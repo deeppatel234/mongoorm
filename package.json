@@ -1,0 +1,19 @@
+{
+  "name": "mongoorm",
+  "version": "0.0.1",
+  "description": "ORM for Mongodb in Node JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deeppatel234/mongoorm.git"
+  },
+  "author": "Deep Patel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deeppatel234/mongoorm/issues"
+  },
+  "homepage": "https://github.com/deeppatel234/mongoorm#readme"
+}
