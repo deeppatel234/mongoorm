@@ -15,5 +15,16 @@
   "bugs": {
     "url": "https://github.com/deeppatel234/mongoorm/issues"
   },
-  "homepage": "https://github.com/deeppatel234/mongoorm#readme"
+  "homepage": "https://github.com/deeppatel234/mongoorm#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.4",
+    "standard": "^11.0.1"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "it"
+    ]
+  }
 }
