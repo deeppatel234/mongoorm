@@ -4,7 +4,7 @@
   "description": "ORM for Mongodb in Node JS",
   "main": "index.js",
   "scripts": {
-    "test": "standard && mocha --recursive"
+    "test": "standard && jest"
   },
   "repository": {
     "type": "git",
@@ -17,18 +17,19 @@
   },
   "homepage": "https://github.com/deeppatel234/mongoorm#readme",
   "dependencies": {
+    "lodash": "^4.17.5",
     "mongodb": "^3.0.4",
     "winston": "^2.4.1"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^5.0.4",
+    "jest": "^22.4.2",
     "standard": "^11.0.1"
   },
   "standard": {
     "globals": [
       "describe",
-      "it"
+      "test",
+      "expect"
     ],
     "ignore": [
       "TESTME/*.js"
