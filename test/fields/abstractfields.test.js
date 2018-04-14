@@ -2,16 +2,17 @@ const AbstractFields = require('../../lib/fields/AbstractFields')
 
 describe('AbstractFields', () => {
   class MyFields extends AbstractFields {
+    constructor (props) {
+      super(props)
+      this.type = 'string'
+
+      this.setSetter([{ prop: 'double', func: (prop, value) => value * 2 }])
+
+      this.setValidator([{ prop: 'three', func: (prop, value) => value === 3, message: '{KEY} should be 3 not {VAL}' }])
+    }
+
     validateType (value) {
       return true
-    }
-
-    initSetter () {
-      this.setAttrs = [{prop: 'double', func: (prop, value) => value * 2}]
-    }
-
-    initValidator () {
-      this.validateAttrs = [{ prop: 'three', func: (prop, value) => value === 3, message: '{KEY} should be 3 not {VAL}' }]
     }
   }
 
@@ -19,7 +20,7 @@ describe('AbstractFields', () => {
     test('basic required test', () => {
       let myField = new MyFields({ required: true })
       expect(myField.validate()).toBe(false)
-      myField.setValue(123)
+      myField.set(123)
       expect(myField.validate()).toBe(true)
     })
 
@@ -33,29 +34,29 @@ describe('AbstractFields', () => {
   describe('default property', () => {
     test('default test', () => {
       let myField = new MyFields({ default: 'Hello' })
-      expect(myField.getValue()).toBe('Hello')
-      myField.setValue('World')
-      expect(myField.getValue()).toBe('World')
+      expect(myField.get()).toBe('Hello')
+      myField.set('World')
+      expect(myField.get()).toBe('World')
     })
 
     test('default function test', () => {
       let myField = new MyFields({ default: () => 'Hello' })
-      expect(myField.getValue()).toBe('Hello')
-      myField.setValue('World')
-      expect(myField.getValue()).toBe('World')
+      expect(myField.get()).toBe('Hello')
+      myField.set('World')
+      expect(myField.get()).toBe('World')
     })
   })
 
   describe('setters test', () => {
     test('test double setter', () => {
       let myField = new MyFields({ double: true })
-      myField.setValue(4)
-      expect(myField.getValue()).toBe(8)
+      myField.set(4)
+      expect(myField.get()).toBe(8)
     })
 
     test('double setter not call when no value passed', () => {
       let myField = new MyFields({ double: true })
-      expect(myField.getValue()).toBe(undefined)
+      expect(myField.get()).toBe(undefined)
     })
 
     test('register setters in field', () => {
@@ -70,9 +71,9 @@ describe('AbstractFields', () => {
   describe('validator test', () => {
     test('test three validator', () => {
       let myField = new MyFields({three: true})
-      myField.setValue(9)
+      myField.set(9)
       expect(myField.validate()).toBe(false)
-      myField.setValue(3)
+      myField.set(3)
       expect(myField.validate()).toBe(true)
     })
 
