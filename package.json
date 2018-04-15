@@ -27,6 +27,8 @@
   },
   "standard": {
     "globals": [
+      "beforeAll",
+      "afterAll",
       "describe",
       "test",
       "expect"
@@ -34,5 +36,8 @@
     "ignore": [
       "TESTME/*.js"
     ]
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["/node_modules/"]
   }
 }
