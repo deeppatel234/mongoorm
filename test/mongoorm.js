@@ -1,3 +1,3 @@
-const mongoorm = require('../index')
+const mongoorm = require('../index');
 
-module.exports = mongoorm
+module.exports = mongoorm;

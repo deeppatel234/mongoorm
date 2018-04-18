@@ -5,15 +5,15 @@
 */
 
 // External Libraries
-var MongoClient = require('mongodb').MongoClient
+const { MongoClient } = require('mongodb');
 
 // Internal Functions
-var logger = require('./lib/base/logger').getLogger()
+const logger = require('./lib/base/logger').getLogger();
 
 class Connection {
-  constructor (props) {
-    this.db = null
-    this.client = null
+  constructor() {
+    this.db = null;
+    this.client = null;
   }
   /**
    * For Connect to MongoDB Instance
@@ -22,50 +22,52 @@ class Connection {
    * @param {object} options
    * @memberof Connection
    */
-  connect (connection, options = {}) {
+  connect(connection, options = {}) {
     if (this.db) {
-      return new Promise((resolve) => resolve())
+      return new Promise(resolve => resolve());
     }
-    var self = this
+    const self = this;
     return new Promise((resolve, reject) => {
       MongoClient.connect(connection.url, options).then(function (client) {
-        self.client = client
-        self.db = client.db(connection.name)
-        logger.info('MongoDB Connected at :', connection.url, 'Database:', connection.name)
-        resolve(client)
+        self.client = client;
+        self.db = client.db(connection.name);
+        logger.info('MongoDB Connected at :', connection.url, 'Database:', connection.name);
+        resolve(client);
       }).catch(function (err) {
-        logger.error(err)
-        reject(err)
-      })
-    })
+        logger.error(err);
+        reject(err);
+      });
+    });
   }
   /**
    * get mongodb cursor for db operations
    * @returns connection
    * @memberof Connection
    */
-  get () {
-    return this.db
+  get() {
+    return this.db;
   }
   /**
    * close mongodb connection
    * @param {boolean} force
    * @memberof Connection
    */
-  close (force = false) {
+  close(force = false) {
     if (this.db) {
-      var self = this
+      const self = this;
       return new Promise((resolve, reject) => {
         self.client.close(force).then(function () {
-          logger.info('MongoDB Closing Connection')
-          self.db = null
-          self.client = null
+          logger.info('MongoDB Closing Connection');
+          self.db = null;
+          self.client = null;
+          resolve(true);
         }).catch(function (err) {
-          logger.info('MongoDB Closing Connection Error :', err)
-        })
-      })
+          logger.info('MongoDB Closing Connection Error :', err);
+          reject(err);
+        });
+      });
     }
   }
 }
 
-module.exports = new Connection()
+module.exports = new Connection();
