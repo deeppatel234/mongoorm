@@ -4,7 +4,7 @@
   "description": "ORM for Mongodb in Node JS",
   "main": "index.js",
   "scripts": {
-    "test": "standard && jest"
+    "test": "eslint . && jest"
   },
   "repository": {
     "type": "git",
@@ -22,22 +22,15 @@
     "winston": "^2.4.1"
   },
   "devDependencies": {
-    "jest": "^22.4.2",
-    "standard": "^11.0.1"
-  },
-  "standard": {
-    "globals": [
-      "beforeAll",
-      "afterAll",
-      "describe",
-      "test",
-      "expect"
-    ],
-    "ignore": [
-      "TESTME/*.js"
-    ]
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jest": "^21.15.0",
+    "jest": "^22.4.2"
   },
   "jest": {
-    "testPathIgnorePatterns": ["/node_modules/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
