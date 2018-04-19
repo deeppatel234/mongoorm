@@ -7,7 +7,14 @@ const mlabdbConfig = {
   name: 'mongoormtest',
 };
 
-beforeAll(() => mongoorm.db.connect(mlabdbConfig));
+const localdbConfig = {
+  url: 'mongodb://localhost:27017',
+  name: 'test',
+};
+
+let dbConfig = process.env.NODE_ENV === 'local' ? localdbConfig : mlabdbConfig;
+
+beforeAll(() => mongoorm.db.connect(dbConfig));
 
 afterAll(() => mongoorm.db.close());
 

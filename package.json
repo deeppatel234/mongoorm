@@ -4,7 +4,9 @@
   "description": "ORM for Mongodb in Node JS",
   "main": "index.js",
   "scripts": {
-    "test": "eslint . && jest"
+    "test": "jest",
+    "test-local": "cross-env NODE_ENV=local jest",
+    "lint": "eslint . "
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,7 @@
     "winston": "^2.4.1"
   },
   "devDependencies": {
+    "cross-env": "^5.1.4",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
