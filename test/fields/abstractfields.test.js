@@ -85,4 +85,18 @@ describe('AbstractFields', () => {
       expect(myField.validateAttrs.length).toBe(4);
     });
   });
+
+  describe('modified field test', () => {
+    test('modified when init fields', () => {
+      let myField = new MyFields({ three: true });
+      myField.initValue(9);
+      expect(myField.markModified).toBeTruthy();
+    });
+
+    test('modified when set fields', () => {
+      let myField = new MyFields({ three: true });
+      myField.set(9);
+      expect(myField.markModified).toBeTruthy();
+    });
+  });
 });
