@@ -99,4 +99,20 @@ describe('AbstractFields', () => {
       expect(myField.markModified).toBeTruthy();
     });
   });
+
+  describe('required props test', () => {
+    class MyProp extends AbstractFields {
+      getRequiredProps() {
+        return ['myprop'];
+      }
+    }
+
+    test('should throw myprop not defined error', () => {
+      expect(() => new MyProp()).toThrowError('myprop is not defined');
+    });
+
+    test('should not throw myprop not defined error', () => {
+      expect(() => new MyProp({ myprop: true })).toBeDefined();
+    });
+  });
 });
