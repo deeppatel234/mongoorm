@@ -2,17 +2,10 @@ const mongoorm = require('../mongoorm');
 
 const { Document } = mongoorm;
 
-const mlabdbConfig = {
-  url: 'mongodb://test:test123@ds113648.mlab.com:13648/mongoormtest',
-  name: 'mongoormtest',
-};
-
-const localdbConfig = {
+const dbConfig = {
   url: 'mongodb://localhost:27017',
   name: 'mongoormtest',
 };
-
-let dbConfig = process.env.NODE_ENV === 'local' ? localdbConfig : mlabdbConfig;
 
 beforeAll(async () => {
   await mongoorm.db.connect(dbConfig);
