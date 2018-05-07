@@ -8,7 +8,7 @@
 const { MongoClient } = require('mongodb');
 
 // Internal Functions
-const logger = require('./lib/base/logger').getLogger();
+const logger = require('./lib/base/Logger');
 
 class Connection {
   constructor() {
