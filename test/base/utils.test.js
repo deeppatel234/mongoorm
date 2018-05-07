@@ -1,4 +1,4 @@
-const MongoUtils = require('../../lib/base/mongoutils');
+const MongoUtils = require('../../lib/base/MongoUtils');
 
 describe('Mongo Utils', () => {
   describe('object to dot notation object', () => {
