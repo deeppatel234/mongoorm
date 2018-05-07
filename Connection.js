@@ -6,14 +6,16 @@
 
 // External Libraries
 const { MongoClient } = require('mongodb');
+const _ = require('lodash');
 
 // Internal Functions
 const logger = require('./lib/base/Logger');
+const mognoURI = require('./lib/base/MognoURI');
 
 class Connection {
   constructor() {
-    this.db = null;
     this.client = null;
+    this.connection = {};
   }
   /**
    * For Connect to MongoDB Instance
@@ -22,16 +24,16 @@ class Connection {
    * @param {object} options
    * @memberof Connection
    */
-  connect(connection, options = {}) {
-    if (this.db) {
+  connect(uri, options = {}) {
+    if (this.client) {
       return new Promise(resolve => resolve());
     }
-    const self = this;
+    uri = this.getURI(uri);
+    let self = this;
     return new Promise((resolve, reject) => {
-      MongoClient.connect(connection.url, options).then(function (client) {
+      MongoClient.connect(uri, options).then(function (client) {
         self.client = client;
-        self.db = client.db(connection.name);
-        logger.info('MongoDB Connected at :', connection.url, 'Database:', connection.name);
+        logger.info('MongoDB Connected at :', self.connection.hosts.map(h => h.host).join(), 'Database:', self.connection.database);
         resolve(client);
       }).catch(function (err) {
         logger.error(err);
@@ -40,25 +42,16 @@ class Connection {
     });
   }
   /**
-   * get mongodb cursor for db operations
-   * @returns connection
-   * @memberof Connection
-   */
-  get() {
-    return this.db;
-  }
-  /**
    * close mongodb connection
    * @param {boolean} force
    * @memberof Connection
    */
   close(force = false) {
-    if (this.db) {
+    if (this.client) {
       const self = this;
       return new Promise((resolve, reject) => {
         self.client.close(force).then(function () {
           logger.info('MongoDB Closing Connection');
-          self.db = null;
           self.client = null;
           resolve(true);
         }).catch(function (err) {
@@ -67,6 +60,35 @@ class Connection {
         });
       });
     }
+  }
+  /**
+   * get mongodb client
+   * @returns connection
+   * @memberof Connection
+   */
+  get() {
+    return this.client;
+  }
+  /**
+   * get mongodb cursor for db operations
+   * @returns connection
+   * @memberof Connection
+   */
+  getDB() {
+    return this.client.db();
+  }
+  /**
+   * parse string from object
+   * @param {string|object} uri
+   * @memberof Connection
+   */
+  getURI(uri) {
+    if (_.isObject(uri)) {
+      this.connection = uri;
+      return mognoURI.parseObject(uri);
+    }
+    this.connection = mognoURI.parseString(uri);
+    return uri;
   }
 }
 

@@ -4,8 +4,10 @@
  *   =====================================
  */
 const logger = require('./lib/base/Logger');
+const connection = require('./Connection');
 
-exports.db = require('./db');
+exports.connect = (uri, options) => connection.connect(uri, options);
+exports.close = force => connection.close(force);
 
 exports.setLogger = log => logger.setLogger(log);
 

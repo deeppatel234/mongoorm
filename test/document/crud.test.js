@@ -2,13 +2,13 @@ const mongoorm = require('../mongoorm');
 
 const { Document } = mongoorm;
 
-const dbConfig = {
-  url: 'mongodb://localhost:27017',
-  name: 'mongoormtest',
-};
+mongoorm.setLogger({
+  info: console.info,
+  error: console.error,
+});
 
 beforeAll(async () => {
-  await mongoorm.db.connect(dbConfig);
+  await mongoorm.connect('mongodb://localhost:27017/mongoormtest');
 });
 
 class User extends Document {
@@ -139,5 +139,5 @@ describe('CRUD Operations With Timestamps', () => {
 
 afterAll(async () => {
   await this.user.drop();
-  await mongoorm.db.close();
+  await mongoorm.close(true);
 });
