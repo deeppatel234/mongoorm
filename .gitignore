@@ -62,3 +62,6 @@ typings/
 
 # test orm
 testorm
+
+# Webstorm editor config
+.idea
