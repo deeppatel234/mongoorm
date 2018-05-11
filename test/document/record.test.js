@@ -3,31 +3,34 @@ const Fields = require('../../lib/fields');
 
 beforeAll(() => {
   this.documents = {
-    fields: {
-      _id: Fields.ObjectId(),
-      name: Fields.String(),
-      age: Fields.String({ required: true }),
-      address: {
-        city: Fields.String(),
-        pin: Fields.String(),
-        location: {
-          latitude: Fields.String(),
-          longitude: Fields.String(),
+    fields: Fields.Object({
+      ele: {
+        _id: Fields.ObjectId(),
+        name: Fields.String(),
+        age: Fields.String({ required: true }),
+        address: {
+          city: Fields.String(),
+          pin: Fields.String(),
+          location: {
+            latitude: Fields.String(),
+            longitude: Fields.String(),
+          },
         },
+        create_at: Fields.DateTime({ default: 'now' }),
+        write_at: Fields.DateTime({ default: 'now' }),
       },
-      create_at: Fields.DateTime({ default: 'now' }),
-      write_at: Fields.DateTime({ default: 'now' }),
-    },
+    }),
     customFunctions: {
       capsName() {
         return this.name.get().toUpperCase();
       },
     },
-    timestampFields: {
+    timestamps: {
       createAt: 'create_at',
       writeAt: 'write_at',
     },
   };
+
 
   this.data = {
     _id: 1,
@@ -58,20 +61,6 @@ describe('Document Record', () => {
 
   test('tojson function', () => {
     expect(this.record.toJson()).toMatchObject(this.data);
-  });
-
-  describe('getfields function', () => {
-    test('get all fields', () => {
-      expect(Object.keys(this.record._getFields())).toMatchObject(['_id', 'name', 'age', 'address', 'create_at', 'write_at']);
-    });
-
-    test('omitting id fields', () => {
-      expect(Object.keys(this.record._getFields(false))).toMatchObject(['name', 'age', 'address', 'create_at', 'write_at']);
-    });
-
-    test('omitting id timestampfields', () => {
-      expect(Object.keys(this.record._getFields(true, false))).toMatchObject(['_id', 'name', 'age', 'address']);
-    });
   });
 
   describe('timestamps function', () => {

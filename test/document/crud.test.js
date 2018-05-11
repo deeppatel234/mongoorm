@@ -37,7 +37,6 @@ class UserWith extends Document {
   constructor() {
     super();
     this.documentName = 'user';
-    this.timestampFields = false;
   }
 
   initFields(fields) {
