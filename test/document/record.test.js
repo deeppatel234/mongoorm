@@ -45,7 +45,7 @@ beforeAll(() => {
       },
     },
   };
-  this.record = new Record(this.documents, this.data);
+  this.record = new Record(this.documents, this.data, { validateBefourSave: true });
 });
 
 describe('Document Record', () => {
@@ -101,6 +101,14 @@ describe('Document Record', () => {
   test('validate function', () => {
     expect(this.record.validate().isValid).toBeTruthy();
     this.record.age.set();
+    expect(this.record.validate().isValid).toBeFalsy();
+  });
+
+  test('validateBefourSave option', () => {
+    this.record.age.set();
+    this.record.options.validateBefourSave = false;
+    expect(this.record.validate().isValid).toBeTruthy();
+    this.record.options.validateBefourSave = true;
     expect(this.record.validate().isValid).toBeFalsy();
   });
 });
