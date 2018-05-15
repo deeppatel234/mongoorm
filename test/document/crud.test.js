@@ -12,11 +12,6 @@ beforeAll(async () => {
 });
 
 class User extends Document {
-  constructor() {
-    super();
-    this.documentName = 'user';
-  }
-
   getTimestampFields() {
     return false;
   }
@@ -34,11 +29,6 @@ class User extends Document {
 }
 
 class UserWith extends Document {
-  constructor() {
-    super();
-    this.documentName = 'user';
-  }
-
   initFields(fields) {
     return {
       firstname: fields.String(),
@@ -51,8 +41,8 @@ class UserWith extends Document {
   }
 }
 
-this.user = new User();
-this.userWith = new UserWith();
+this.user = new User({ document: 'user' });
+this.userWith = new UserWith({ document: 'user' });
 
 this.userData = {
   firstname: 'Deep',

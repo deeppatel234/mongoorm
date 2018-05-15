@@ -11,6 +11,7 @@ const _ = require('lodash');
 // Internal Functions
 const logger = require('./lib/base/Logger');
 const mognoURI = require('./lib/base/MognoURI');
+const config = require('./lib/base/Configuration');
 
 class Connection {
   constructor() {
@@ -24,7 +25,8 @@ class Connection {
    * @param {object} options
    * @memberof Connection
    */
-  connect(uri, options = {}) {
+  connect(uri, options) {
+    options = this.scanOptions(options);
     if (this.client) {
       return new Promise(resolve => resolve());
     }
@@ -89,6 +91,18 @@ class Connection {
     }
     this.connection = mognoURI.parseString(uri);
     return uri;
+  }
+  /**
+   * scan options before connect to db
+   * @param {object} options
+   * @memberof Connection
+   */
+  scanOptions(options = {}) {
+    if ('autoIndex' in options) {
+      config.set('autoIndex', options.autoIndex);
+      delete options.autoIndex;
+    }
+    return options;
   }
 }
 

@@ -20,6 +20,7 @@ module.exports = {
     "func-names": 0,
     "prefer-arrow-callback": 0,
     "consistent-return": 0,
+    "no-await-in-loop": 0,
   },
 
   env: {
