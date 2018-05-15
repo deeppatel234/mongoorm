@@ -115,4 +115,16 @@ describe('AbstractFields', () => {
       expect(() => new MyProp({ myprop: true })).toBeDefined();
     });
   });
+
+  describe('getProps field test', () => {
+    test('getProps with string param', () => {
+      let myField = new MyFields({ three: true });
+      expect(myField.getProps('three')).toBe(true);
+    });
+
+    test('getProps with list param', () => {
+      let myField = new MyFields({ three: true });
+      expect(myField.getProps(['three'])).toMatchObject({ three: true });
+    });
+  });
 });
