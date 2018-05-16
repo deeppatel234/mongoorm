@@ -201,4 +201,18 @@ describe('ObjectFields', () => {
       });
     });
   });
+
+  describe('getGlobleProps test', () => {
+    test('basic getGlobleProps', () => {
+      let myField = Fields.Object({ ele });
+      expect(myField.getGlobleProps('required')).toMatchObject({ name: true, address: { city: true } });
+      expect(myField.getGlobleProps(['required'])).toMatchObject({ name: { required: true }, address: { city: { required: true } } });
+    });
+
+    test('compalex getGlobleProps', () => {
+      let myField = Fields.Object({ ele: complexEle });
+      expect(myField.getGlobleProps('required')).toMatchObject({ h: true, a: { f: true, b: { d: { e: true } } } });
+      expect(myField.getGlobleProps(['required'])).toMatchObject({ h: { required: true }, a: { f: { required: true }, b: { d: { e: { required: true } } } } });
+    });
+  });
 });
