@@ -126,6 +126,84 @@ describe('CRUD Operations With Timestamps', () => {
   });
 });
 
+describe('Hooks Test', () => {
+  class MyHooks extends Document {
+    initFields(fields) {
+      return {
+        firstname: fields.String(),
+        lastname: fields.String(),
+      };
+    }
+  }
+
+  this.myHooks = new MyHooks({ document: 'user' });
+
+  describe('Hooks resolved', () => {
+    test('pre, post hook when save record', async () => {
+      expect.assertions(5);
+      let seq = [];
+      this.myHooks.preSave = jest.fn(function () {
+        expect(this.firstname.get()).toBe('Deep');
+        seq.push('preSave');
+        return Promise.resolve();
+      });
+      this.myHooks.postSave = jest.fn(function () {
+        expect(this.lastname.get()).toBe('Patel');
+        seq.push('postSave');
+        return Promise.resolve();
+      });
+      await this.myHooks.create(this.userData).save();
+      expect(this.myHooks.preSave).toHaveBeenCalled();
+      expect(this.myHooks.postSave).toHaveBeenCalled();
+      expect(seq).toEqual(['preSave', 'postSave']);
+    });
+
+    test('pre, post hook when delete record', async () => {
+      expect.assertions(5);
+      let seq = [];
+      this.myHooks.preDelete = jest.fn(function () {
+        expect(this.firstname.get()).toBe('Deep');
+        seq.push('preDelete');
+        return Promise.resolve();
+      });
+      this.myHooks.postDelete = jest.fn(function () {
+        expect(this.lastname.get()).toBe('Patel');
+        seq.push('postDelete');
+        return Promise.resolve();
+      });
+      await this.myHooks.create(this.userData).delete();
+      expect(this.myHooks.preDelete).toHaveBeenCalled();
+      expect(this.myHooks.postDelete).toHaveBeenCalled();
+      expect(seq).toEqual(['preDelete', 'postDelete']);
+    });
+  });
+
+  describe('Hooks rejected', () => {
+    test('pre, post hook when save record', async () => {
+      expect.assertions(4);
+      let seq = [];
+      this.myHooks.preSave = jest.fn(function () {
+        expect(this.firstname.get()).toBe('Deep');
+        seq.push('preSave');
+        return Promise.reject(new Error('break pre save'));
+      });
+      this.myHooks.postSave = jest.fn(function () {
+        seq.push('postSave');
+        return Promise.resolve();
+      });
+      try {
+        await this.myHooks.create(this.userData).save();
+      } catch (e) {
+        expect(e.message).toBe('break pre save');
+      } finally {
+        expect(this.myHooks.preSave).toHaveBeenCalled();
+        expect(seq).toEqual(['preSave']);
+      }
+    });
+  });
+});
+
+
 afterAll(async () => {
   await this.user.drop();
   await mongoorm.close(true);
