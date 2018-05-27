@@ -32,35 +32,31 @@ describe('StringFields', () => {
   });
 
   describe('required property', () => {
-    test('(+) field required', () => {
+    test('(+) field required', async () => {
       let field = new StringFields({ required: true });
       field.set(stringValue);
-      expect(field.validate()).toBe(true);
+      await expect(field.validate()).resolves.toBe();
     });
 
-    test('(+) field not required', () => {
+    test('(+) field not required', async () => {
       let field = new StringFields({ required: false });
-      expect(field.validate()).toBe(true);
+      await expect(field.validate()).resolves.toBe();
     });
 
-    test('(-) field required', () => {
+    test('(-) field required', async () => {
       let field = new StringFields({ required: true });
       field.set(nonStringValue);
-      expect(field.validate()).toBe(false);
+      await expect(field.validate()).rejects.toThrow('is not string type');
     });
 
-    test('(+) error message when key is given', () => {
+    test('(+) error message when key is given', async () => {
       let field = new StringFields({ required: true });
-      expect(field.validate()).toBeFalsy();
-      expect(field.getErrorMessage('key').length).toBe(1);
-      expect(field.getErrorMessage('key')[0]).toBe('key is required fields');
+      await expect(field.validate()).rejects.toThrow('is required fields');
     });
 
-    test('(-) error message when key is not given', () => {
+    test('(-) error message when key is not given', async () => {
       let field = new StringFields({ required: true });
-      expect(field.validate()).toBeFalsy();
-      expect(field.getErrorMessage('key').length).toBe(1);
-      expect(field.getErrorMessage()[0]).toBe('undefined is required fields');
+      await expect(field.validate()).rejects.toThrow('is required fields');
     });
   });
 
@@ -124,10 +120,6 @@ describe('StringFields', () => {
     });
 
     describe('capitalize property', () => {
-      /*
-          * Reference for capitalizeFirstLetter
-          * https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
-          */
       function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
       }
@@ -150,104 +142,86 @@ describe('StringFields', () => {
     describe('match validator', () => {
       let regularExpression = /ing/g;
 
-      test('(+) correct match', () => {
+      test('(+) correct match', async () => {
         let field = new StringFields({ match: regularExpression });
         field.set('string');
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect match', () => {
+      test('(-) incorrect match', async () => {
         let field = new StringFields({ match: regularExpression });
         field.set('other');
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key is not valid');
+        await expect(field.validate()).rejects.toThrow('is not valid');
       });
     });
 
     describe('maxLength validator', () => {
-      test('(+) correct maxLength', () => {
+      test('(+) correct maxLength', async () => {
         let field = new StringFields({ maxLength: 10 });
         field.set('string');
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect maxLength', () => {
+      test('(-) incorrect maxLength', async () => {
         let field = new StringFields({ maxLength: 3 });
         field.set('other');
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be max 3 length');
+        await expect(field.validate()).rejects.toThrow('should be max 3 length');
       });
 
       describe('enum validator', () => {
-        test('(+) correct enum', () => {
+        test('(+) correct enum', async () => {
           let field = new StringFields({ enum: ['MALE', 'FEMALE'] });
           field.set('MALE');
-          expect(field.validate()).toBe(true);
-          expect(field.getErrorMessage('key').length).toBe(0);
+          await expect(field.validate()).resolves.toBe();
         });
 
-        test('(-) incorrect enum', () => {
+        test('(-) incorrect enum', async () => {
           let field = new StringFields({ enum: ['MALE', 'FEMALE'] });
           field.set('UNKNOWN');
-          expect(field.validate()).toBe(false);
-          expect(field.getErrorMessage('key').length).toBe(1);
-          expect(field.getErrorMessage('key')[0]).toBe('key is not valid enum value');
+          await expect(field.validate()).rejects.toThrow('is not valid enum value');
         });
       });
     });
 
     describe('minLength validator', () => {
-      test('(+) correct minLength', () => {
+      test('(+) correct minLength', async () => {
         let field = new StringFields({ minLength: 1 });
         field.set('string');
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect maxLength', () => {
+      test('(-) incorrect maxLength', async () => {
         let field = new StringFields({ minLength: 10 });
         field.set('other');
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be min 10 length');
+        await expect(field.validate()).rejects.toThrow('should be min 10 length');
       });
     });
 
     describe('email validator', () => {
-      test('(+) correct email', () => {
+      test('(+) correct email', async () => {
         let field = new StringFields({ email: true });
         field.set('foo@bar.com');
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect email', () => {
+      test('(-) incorrect email', async () => {
         let field = new StringFields({ email: true });
         field.set('foobar.com');
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key is not valid email');
+        await expect(field.validate()).rejects.toThrow('is not valid email');
       });
     });
 
     describe('enum validator', () => {
-      test('(+) correct enum', () => {
+      test('(+) correct enum', async () => {
         let field = new StringFields({ enum: ['MALE', 'FEMALE'] });
         field.set('MALE');
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect enum', () => {
+      test('(-) incorrect enum', async () => {
         let field = new StringFields({ enum: ['MALE', 'FEMALE'] });
         field.set('UNKNOWN');
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key is not valid enum value');
+        await expect(field.validate()).rejects.toThrow('is not valid enum value');
       });
     });
   });

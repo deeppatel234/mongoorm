@@ -98,17 +98,17 @@ describe('Document Record', () => {
     });
   });
 
-  test('validate function', () => {
-    expect(this.record.validate().isValid).toBeTruthy();
+  test('validate function', async () => {
+    await expect(this.record.validate()).resolves.toBe();
     this.record.age.set();
-    expect(this.record.validate().isValid).toBeFalsy();
+    await expect(this.record.validate()).rejects.toThrow('Error: is required fields');
   });
 
-  test('validateBefourSave option', () => {
+  test('validateBefourSave option', async () => {
     this.record.age.set();
     this.record.options.validateBefourSave = false;
-    expect(this.record.validate().isValid).toBeTruthy();
+    await expect(this.record.validate()).resolves.toBe();
     this.record.options.validateBefourSave = true;
-    expect(this.record.validate().isValid).toBeFalsy();
+    await expect(this.record.validate()).rejects.toThrow('Error: is required fields');
   });
 });

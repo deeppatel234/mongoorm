@@ -40,7 +40,7 @@ describe('ObjectFields', () => {
   });
 
   describe('validate data test', () => {
-    test('basic validate data', () => {
+    test('basic validate data', async () => {
       let myField = Fields.Object({ ele });
       myField.initValue({
         name: 'deep',
@@ -48,12 +48,16 @@ describe('ObjectFields', () => {
           pin: 384002,
         },
       });
-      expect(myField.validate()).toBeFalsy();
+      try {
+        await myField.validate();
+      } catch (e) {
+        expect(e.message).toBe('Error: Error: is required fields');
+      }
       myField.address.city.set('gandhinagar');
-      expect(myField.validate()).toBeTruthy();
+      expect(await myField.validate()).toBe();
     });
 
-    test('compalex validate data', () => {
+    test('compalex validate data', async () => {
       let myField = Fields.Object({ ele: complexEle });
       myField.initValue({
         h: 'h',
@@ -65,11 +69,22 @@ describe('ObjectFields', () => {
         },
         i: 4,
       });
-      expect(myField.validate()).toBeFalsy();
+
+      try {
+        await myField.validate();
+      } catch (e) {
+        expect(e.message).toBe('Error: Error: is required fields');
+      }
+
       myField.a.f.set('z');
-      expect(myField.validate()).toBeFalsy();
+
+      try {
+        await myField.validate();
+      } catch (e) {
+        expect(e.message).toBe('Error: Error: Error: Error: is required fields');
+      }
       myField.a.b.d.e.set('x');
-      expect(myField.validate()).toBeTruthy();
+      expect(await myField.validate()).toBe();
     });
   });
 
