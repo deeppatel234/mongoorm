@@ -17,17 +17,11 @@ describe('AbstractFields', () => {
   }
 
   describe('required property', () => {
-    test('basic required test', () => {
+    test('basic required test', async () => {
       let myField = new MyFields({ required: true });
-      expect(myField.validate()).toBe(false);
+      expect(myField.validate()).rejects.toThrow('is required fields');
       myField.set(123);
-      expect(myField.validate()).toBe(true);
-    });
-
-    test('required error message should be hello is required fields', () => {
-      let myField = new MyFields({ required: true });
-      myField.validate();
-      expect(myField.getErrorMessage('hello')[0]).toBe('hello is required fields');
+      expect(myField.validate()).resolves.toBe();
     });
   });
 
@@ -69,12 +63,12 @@ describe('AbstractFields', () => {
   });
 
   describe('validator test', () => {
-    test('test three validator', () => {
+    test('test three validator', async () => {
       let myField = new MyFields({ three: true });
       myField.set(9);
-      expect(myField.validate()).toBe(false);
+      expect(myField.validate()).rejects.toThrow('{KEY} should be 3 not true');
       myField.set(3);
-      expect(myField.validate()).toBe(true);
+      expect(myField.validate()).resolves.toBe();
     });
 
     test('register validator in field', () => {
