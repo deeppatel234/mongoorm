@@ -32,35 +32,26 @@ describe('BooleanFields', () => {
   });
 
   describe('required property', () => {
-    test('(+) field required', () => {
+    test('(+) field required', async () => {
       let field = new BooleanFields({ required: true });
       field.set(booleanValue);
-      expect(field.validate()).toBe(true);
+      expect(await field.validate()).toBe();
     });
 
-    test('(+) field not required', () => {
+    test('(+) field not required', async () => {
       let field = new BooleanFields({ required: false });
-      expect(field.validate()).toBe(true);
+      expect(await field.validate()).toBe();
     });
 
-    test('(-) field required', () => {
+    test('(-) field required', async () => {
       let field = new BooleanFields({ required: true });
       field.set(nonBooleanValue);
-      expect(field.validate()).toBe(false);
+      await expect(field.validate()).rejects.toThrow('is not boolean type');
     });
 
-    test('(+) error message when key is given', () => {
+    test('(+) error message when key is given', async () => {
       let field = new BooleanFields({ required: true });
-      expect(field.validate()).toBeFalsy();
-      expect(field.getErrorMessage('key').length).toBe(1);
-      expect(field.getErrorMessage('key')[0]).toBe('key is required fields');
-    });
-
-    test('(-) error message when key is not given', () => {
-      let field = new BooleanFields({ required: true });
-      expect(field.validate()).toBeFalsy();
-      expect(field.getErrorMessage('key').length).toBe(1);
-      expect(field.getErrorMessage()[0]).toBe('undefined is required fields');
+      await expect(field.validate()).rejects.toThrow('is required fields');
     });
   });
 

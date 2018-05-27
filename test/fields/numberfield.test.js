@@ -32,35 +32,31 @@ describe('NumberFields', () => {
   });
 
   describe('required property', () => {
-    test('(+) field required', () => {
+    test('(+) field required', async () => {
       let field = new NumberFields({ required: true });
       field.set(numberValue);
-      expect(field.validate()).toBe(true);
+      await expect(field.validate()).resolves.toBe();
     });
 
-    test('(+) field not required', () => {
+    test('(+) field not required', async () => {
       let field = new NumberFields({ required: false });
-      expect(field.validate()).toBe(true);
+      await expect(field.validate()).resolves.toBe();
     });
 
-    test('(-) field required', () => {
+    test('(-) field required', async () => {
       let field = new NumberFields({ required: true });
       field.set(nonNumberValue);
-      expect(field.validate()).toBe(false);
+      await expect(field.validate()).rejects.toThrow('is not number type');
     });
 
-    test('(+) error message when key is given', () => {
+    test('(+) error message when key is given', async () => {
       let field = new NumberFields({ required: true });
-      expect(field.validate()).toBeFalsy();
-      expect(field.getErrorMessage('key').length).toBe(1);
-      expect(field.getErrorMessage('key')[0]).toBe('key is required fields');
+      await expect(field.validate()).rejects.toThrow('is required fields');
     });
 
-    test('(-) error message when key is not given', () => {
+    test('(-) error message when key is not given', async () => {
       let field = new NumberFields({ required: true });
-      expect(field.validate()).toBeFalsy();
-      expect(field.getErrorMessage('key').length).toBe(1);
-      expect(field.getErrorMessage()[0]).toBe('undefined is required fields');
+      await expect(field.validate()).rejects.toThrow('is required fields');
     });
   });
 
@@ -82,112 +78,92 @@ describe('NumberFields', () => {
 
   describe('validators test', () => {
     describe('min value validator', () => {
-      test('(+) correct min value', () => {
+      test('(+) correct min value', async () => {
         let field = new NumberFields({ min: 100 });
         field.set(123);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect min value', () => {
+      test('(-) incorrect min value', async () => {
         let field = new NumberFields({ min: 100 });
         field.set(99);
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be minimum 100');
+        await expect(field.validate()).rejects.toThrow('should be minimum 100');
       });
     });
 
     describe('max value validator', () => {
-      test('(+) correct max value', () => {
+      test('(+) correct max value', async () => {
         let field = new NumberFields({ max: 100 });
         field.set(99);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect max value', () => {
+      test('(-) incorrect max value', async () => {
         let field = new NumberFields({ max: 100 });
         field.set(123);
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be maximum 100');
+        await expect(field.validate()).rejects.toThrow('should be maximum 100');
       });
     });
 
     describe('exclusiveMin value validator', () => {
-      test('(+) correct exclusiveMin value', () => {
+      test('(+) correct exclusiveMin value', async () => {
         let field = new NumberFields({ exclusiveMin: 100 });
         field.set(101);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
 
         field.set(100);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect exclusiveMin value', () => {
+      test('(-) incorrect exclusiveMin value', async () => {
         let field = new NumberFields({ exclusiveMin: 100 });
         field.set(90);
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be greater or equal to 100');
+        await expect(field.validate()).rejects.toThrow('should be greater or equal to 100');
       });
     });
 
     describe('exclusiveMax value validator', () => {
-      test('(+) correct exclusiveMax value', () => {
+      test('(+) correct exclusiveMax value', async () => {
         let field = new NumberFields({ exclusiveMax: 100 });
         field.set(90);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
 
         field.set(100);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect exclusiveMax value', () => {
+      test('(-) incorrect exclusiveMax value', async () => {
         let field = new NumberFields({ exclusiveMax: 100 });
         field.set(111);
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be less or equal to 100');
+        await expect(field.validate()).rejects.toThrow('should be less or equal to 100');
       });
     });
 
     describe('multipleOf value validator', () => {
-      test('(+) correct multipleOf value', () => {
+      test('(+) correct multipleOf value', async () => {
         let field = new NumberFields({ multipleOf: 2 });
         field.set(20);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect multipleOf value', () => {
+      test('(-) incorrect multipleOf value', async () => {
         let field = new NumberFields({ multipleOf: 2 });
         field.set(123);
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key should be multiple of 2');
+        await expect(field.validate()).rejects.toThrow('should be multiple of 2');
       });
     });
 
     describe('enum value validator', () => {
-      test('(+) correct enum value', () => {
+      test('(+) correct enum value', async () => {
         let field = new NumberFields({ enum: [10, 20, 30, 40, 50] });
         field.set(20);
-        expect(field.validate()).toBeTruthy();
-        expect(field.getErrorMessage('key').length).toBe(0);
+        await expect(field.validate()).resolves.toBe();
       });
 
-      test('(-) incorrect enum value', () => {
+      test('(-) incorrect enum value', async () => {
         let field = new NumberFields({ enum: [10, 20, 30, 40, 50] });
         field.set(123);
-        expect(field.validate()).toBeFalsy();
-        expect(field.getErrorMessage('key').length).toBe(1);
-        expect(field.getErrorMessage('key')[0]).toBe('key is not valid enum value');
+        await expect(field.validate()).rejects.toThrow('is not valid enum value');
       });
     });
   });

@@ -19,9 +19,9 @@ describe('AbstractFields', () => {
   describe('required property', () => {
     test('basic required test', async () => {
       let myField = new MyFields({ required: true });
-      expect(myField.validate()).rejects.toThrow('is required fields');
+      await expect(myField.validate()).rejects.toThrow('is required fields');
       myField.set(123);
-      expect(myField.validate()).resolves.toBe();
+      await expect(myField.validate()).resolves.toBe();
     });
   });
 
@@ -66,9 +66,9 @@ describe('AbstractFields', () => {
     test('test three validator', async () => {
       let myField = new MyFields({ three: true });
       myField.set(9);
-      expect(myField.validate()).rejects.toThrow('{KEY} should be 3 not true');
+      await expect(myField.validate()).rejects.toThrow('{KEY} should be 3 not true');
       myField.set(3);
-      expect(myField.validate()).resolves.toBe();
+      await expect(myField.validate()).resolves.toBe();
     });
 
     test('register validator in field', () => {

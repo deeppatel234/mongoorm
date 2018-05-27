@@ -2,18 +2,17 @@ const { Fields } = require('../mongoorm');
 
 describe('ArrayFields', () => {
   describe('required property', () => {
-    test('basic required test', () => {
+    test('basic required test', async () => {
       const req = Fields.Array({ ele: Fields.String(), required: true });
-      expect(req.validate()).toBeFalsy();
+      await expect(req.validate()).rejects.toThrow('is required fields');
       req.push('hello');
-      expect(req.validate()).toBeTruthy();
+      await expect(req.validate()).resolves.toBe();
     });
 
-    test('empty array required test', () => {
+    test('empty array required test', async () => {
       const req = Fields.Array({ ele: Fields.String(), required: true });
       req.initValue([]);
-      expect(req.validate()).toBeFalsy();
-      expect(req.getErrorMessage('hello')[0]).toBe('hello is required fields');
+      await expect(req.validate()).rejects.toThrow('is required fields');
     });
   });
 
@@ -31,41 +30,51 @@ describe('ArrayFields', () => {
 
   describe('validation test', () => {
     describe('array field with non-object element', () => {
-      test('validate with string array', () => {
+      test('validate with string array', async () => {
         let myField = Fields.Array({ ele: Fields.String({ uppercase: true }) });
         myField.initValue(['a', 5, 'b']);
-        expect(myField.validate()).toBeFalsy();
-        expect(myField.getErrorMessage('hello')[0]).toBe('hello : 1 index is not string type');
+        try {
+          await myField.validate();
+        } catch (e) {
+          expect(e.message).toBe('{KEY} : 1 index Error: is not string type');
+        }
         myField.initValue(['a', 'c', 'b']);
-        expect(myField.validate()).toBeTruthy();
+        expect(await myField.validate()).toBe();
       });
 
-      test('validate with array of array', () => {
+      test('validate with array of array', async () => {
         let myField = Fields.Array({
           ele: Fields.Array({ ele: Fields.String({ uppercase: true }) }),
         });
         myField.initValue([['a', 'b', 'c'], ['d', 5, 'f']]);
-        expect(myField.validate()).toBeFalsy();
-        expect(myField.getErrorMessage('hello')[0]).toBe('hello : 1 index : 1 index is not string type');
+        try {
+          await myField.validate();
+        } catch (e) {
+          expect(e.message).toBe('{KEY} : 1 index Error: {KEY} : 1 index Error: is not string type');
+        }
         myField.initValue([['a', 'b', 'c'], ['d', 'g', 'f']]);
-        expect(myField.validate()).toBeTruthy();
+        expect(await myField.validate()).toBe();
       });
 
-      test('validate with array of array of array', () => {
+      test('validate with array of array of array', async () => {
         let myField = Fields.Array({
           ele: Fields.Array({
             ele: Fields.Array({ ele: Fields.String({ uppercase: true }) }),
           }),
         });
         myField.initValue([['a', 'b', 'c'], ['d', 5, 'f']]);
-        expect(myField.validate()).toBeFalsy();
-        expect(myField.getErrorMessage('hello')[0]).toBe('hello : 0 index : 0 index is not array type');
+        try {
+          await myField.validate();
+        } catch (e) {
+          expect(e.message).toBe('{KEY} : 0 index Error: {KEY} : 0 index Error: is not array type');
+        }
         myField.initValue([[['a'], ['b']], [['c'], ['d']]]);
-        expect(myField.validate()).toBeTruthy();
+        expect(await myField.validate()).toBe();
       });
     });
 
-    test('array field with object element', () => {
+    test('array field with object element', async () => {
+      // expect.assertions(2);
       let myField = Fields.Array({
         ele: {
           name: Fields.String({ uppercase: true }),
@@ -80,11 +89,13 @@ describe('ArrayFields', () => {
         name: 'Vivek',
       }]);
 
-      expect(myField.validate()).toBeFalsy();
-      expect(myField.getErrorMessage('hello')[0]).toBe('age is required fields');
-
+      try {
+        await myField.validate();
+      } catch (e) {
+        expect(e.message).toBe('{KEY} : 1 index Error: Error: is required fields');
+      }
       myField.getEle(1).age.set(23);
-      expect(myField.validate()).toBeTruthy();
+      expect(await myField.validate()).toBe();
     });
   });
 
