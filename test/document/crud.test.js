@@ -7,10 +7,6 @@ mongoorm.setLogger({
   error: console.error,
 });
 
-beforeAll(async () => {
-  await mongoorm.connect('mongodb://localhost:27017/mongoormtest');
-});
-
 class User extends Document {
   getTimestampFields() {
     return false;
@@ -41,8 +37,14 @@ class UserWith extends Document {
   }
 }
 
-this.user = new User({ document: 'user' });
-this.userWith = new UserWith({ document: 'user' });
+class MyHooks extends Document {
+  initFields(fields) {
+    return {
+      firstname: fields.String(),
+      lastname: fields.String(),
+    };
+  }
+}
 
 this.userData = {
   firstname: 'Deep',
@@ -52,8 +54,18 @@ this.userData = {
     pin: '384002',
   },
 };
-this.record = this.user.create(this.userData);
-this.recordWith = this.userWith.create(this.userData);
+
+beforeAll(async () => {
+  await mongoorm.connect('mongodb://localhost:27017/mongoormtest');
+
+  this.user = new User({ document: 'user' });
+  this.record = this.user.create(this.userData);
+
+  this.userWith = new UserWith({ document: 'user' });
+  this.recordWith = this.userWith.create(this.userData);
+
+  this.myHooks = new MyHooks({ document: 'user' });
+});
 
 describe('CRUD Operations Without Timestamps', () => {
   test('Create record', async () => {
@@ -127,17 +139,6 @@ describe('CRUD Operations With Timestamps', () => {
 });
 
 describe('Hooks Test', () => {
-  class MyHooks extends Document {
-    initFields(fields) {
-      return {
-        firstname: fields.String(),
-        lastname: fields.String(),
-      };
-    }
-  }
-
-  this.myHooks = new MyHooks({ document: 'user' });
-
   describe('Hooks resolved', () => {
     test('pre, post hook when save record', async () => {
       expect.assertions(5);
