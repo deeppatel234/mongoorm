@@ -22,12 +22,13 @@
     "mongodb": "^3.0.4"
   },
   "devDependencies": {
-    "winston": "^2.4.1",
+    "codecov": "^3.0.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jest": "^21.15.0",
-    "jest": "^22.4.2"
+    "jest": "^22.4.2",
+    "winston": "^2.4.1"
   },
   "jest": {
     "testPathIgnorePatterns": [
