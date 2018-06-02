@@ -72,6 +72,14 @@ class Connection {
     return this.client;
   }
   /**
+   * get document cursor for db operations
+   * @returns connection
+   * @memberof Connection
+   */
+  getCollection(name) {
+    return this.client.db().collection(name);
+  }
+  /**
    * get mongodb cursor for db operations
    * @returns connection
    * @memberof Connection
