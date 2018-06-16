@@ -39,6 +39,26 @@ describe('ObjectFields', () => {
     });
   });
 
+  describe('setFieldName test', () => {
+    test('basic setFieldName', () => {
+      let myField = Fields.Object({ ele });
+      myField.setFieldName('hello');
+      expect(myField.address.fieldName).toBe('address');
+      expect(myField.name.fieldName).toBe('name');
+      expect(myField.address.city.fieldName).toBe('city');
+    });
+
+    test('compalex setFieldName', () => {
+      let myField = Fields.Object({ ele: complexEle });
+      myField.setFieldName('hello');
+      expect(myField.a.fieldName).toBe('a');
+      expect(myField.a.b.fieldName).toBe('b');
+      expect(myField.a.b.c.fieldName).toBe('c');
+      expect(myField.a.b.d.fieldName).toBe('d');
+      expect(myField.a.b.d.e.fieldName).toBe('e');
+    });
+  });
+
   describe('validate data test', () => {
     test('basic validate data', async () => {
       let myField = Fields.Object({ ele });
