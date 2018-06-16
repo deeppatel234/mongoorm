@@ -82,19 +82,19 @@ describe('Document Record', () => {
 
   describe('getFieldsValue function', () => {
     test('getFieldsValue all mode', () => {
-      expect(Object.keys(this.record._getFieldsValue({ mode: 'all' }))).toMatchObject(['_id', 'name', 'age', 'address', 'create_at', 'write_at']);
+      expect(Object.keys(this.record._getFieldsValue('all'))).toMatchObject(['_id', 'name', 'age', 'address', 'create_at', 'write_at']);
     });
 
     test('getFieldsValue save mode', () => {
-      expect(Object.keys(this.record._getFieldsValue({ id: false, timestamp: false }))).toMatchObject(['name', 'age', 'address']);
+      expect(Object.keys(this.record._getFieldsValue('all', false, false))).toMatchObject(['name', 'age', 'address']);
     });
 
     test('getFieldsValue modified mode', () => {
       this.record._triggerSaved({});
-      expect(Object.keys(this.record._getFieldsValue({ mode: 'modified', id: false, timestamp: false }))).toHaveLength(0);
+      expect(Object.keys(this.record._getFieldsValue('modified', false, false))).toHaveLength(0);
       this.record.name.set('hello');
-      expect(Object.keys(this.record._getFieldsValue({ mode: 'modified', id: false, timestamp: false }))).toHaveLength(1);
-      expect(this.record._getFieldsValue({ mode: 'modified', id: false, timestamp: false })).toMatchObject({ name: 'hello' });
+      expect(Object.keys(this.record._getFieldsValue('modified', false, false))).toHaveLength(1);
+      expect(this.record._getFieldsValue('modified', false, false)).toMatchObject({ name: 'hello' });
     });
   });
 

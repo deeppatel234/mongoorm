@@ -21,7 +21,6 @@ module.exports = {
     "prefer-arrow-callback": 0,
     "consistent-return": 0,
     "no-await-in-loop": 0,
-    "no-unused-expressions": [2, { allowTernary: true }],
   },
 
   env: {
