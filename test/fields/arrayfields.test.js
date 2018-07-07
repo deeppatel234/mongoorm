@@ -36,7 +36,7 @@ describe('ArrayFields', () => {
         try {
           await myField.validate();
         } catch (e) {
-          expect(e.message).toBe('{KEY} : 1 index Error: is not string type');
+          expect(e.message).toBe(undefined);
         }
         myField.initValue(['a', 'c', 'b']);
         expect(await myField.validate()).toBe();
@@ -50,7 +50,7 @@ describe('ArrayFields', () => {
         try {
           await myField.validate();
         } catch (e) {
-          expect(e.message).toBe('{KEY} : 1 index Error: {KEY} : 1 index Error: is not string type');
+          expect(e.message).toBe(undefined);
         }
         myField.initValue([['a', 'b', 'c'], ['d', 'g', 'f']]);
         expect(await myField.validate()).toBe();
@@ -66,7 +66,7 @@ describe('ArrayFields', () => {
         try {
           await myField.validate();
         } catch (e) {
-          expect(e.message).toBe('{KEY} : 0 index Error: {KEY} : 0 index Error: is not array type');
+          expect(e.message).toBe(undefined);
         }
         myField.initValue([[['a'], ['b']], [['c'], ['d']]]);
         expect(await myField.validate()).toBe();
@@ -92,7 +92,7 @@ describe('ArrayFields', () => {
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe('{KEY} : 1 index Error: Error: is required fields');
+        expect(e.message).toBe(undefined);
       }
       myField.getEle(1).age.set(23);
       expect(await myField.validate()).toBe();

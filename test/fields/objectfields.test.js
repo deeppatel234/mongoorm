@@ -71,7 +71,7 @@ describe('ObjectFields', () => {
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe('Error: Error: is required fields');
+        expect(e.message).toBe(undefined);
       }
       myField.address.city.set('gandhinagar');
       expect(await myField.validate()).toBe();
@@ -93,7 +93,7 @@ describe('ObjectFields', () => {
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe('Error: Error: is required fields');
+        expect(e.message).toBe(undefined);
       }
 
       myField.a.f.set('z');
@@ -101,7 +101,7 @@ describe('ObjectFields', () => {
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe('Error: Error: Error: Error: is required fields');
+        expect(e.message).toBe(undefined);
       }
       myField.a.b.d.e.set('x');
       expect(await myField.validate()).toBe();
