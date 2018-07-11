@@ -1,6 +1,6 @@
 const mongoorm = require('../mongoorm');
 
-const { Document } = mongoorm;
+const { Document, Fields } = mongoorm;
 
 mongoorm.setLogger({
   info: console.info,
@@ -15,103 +15,144 @@ beforeAll(async () => {
     initFields(fields) {
       return {
         city: fields.String(),
-        pin: fields.String(),
+        pin: fields.Integer({ required: true }),
       };
     }
   }
 
-  let address = new Address({ document: 'address' });
+  this.address = new Address({ document: 'address' });
 
-  class UserOne extends Document {
+  class User extends Document {
     initFields(fields) {
       return {
         firstname: fields.String(),
         lastname: fields.String(),
-        address: fields.One({ doc: address }),
       };
     }
   }
 
-  class UserMany extends Document {
-    initFields(fields) {
-      return {
-        firstname: fields.String(),
-        lastname: fields.String(),
-        address: fields.Many({ doc: address }),
-      };
-    }
-  }
-
-  this.userOneData = {
-    firstname: 'Deep',
-    lastname: 'Patel',
-    address: {
-      city: 'Mehsana',
-      pin: '384002',
-    },
-  };
-
-  this.userManyData = {
-    firstname: 'Deep',
-    lastname: 'Patel',
-    address: [{
-      city: 'Mehsana',
-      pin: '384002',
-    }, {
-      city: 'Gandhinagar',
-      pin: '384007',
-    }],
-  };
-
-  this.userOne = new UserOne({ document: 'user' });
-  this.userMany = new UserMany({ document: 'user' });
-  this.address = address;
-  this.recordOne = this.userOne.create(this.userOneData);
-  this.recordOneUpdate = this.userOne.create(this.userOneData);
-  this.recordMany = this.userMany.create(this.userManyData);
+  this.user = new User({ document: 'user' });
 });
 
 describe('Realtional Field Test', () => {
-  test('Save one field record', async () => {
-    expect.assertions(6);
-    await this.recordOne.save();
-    expect(this.recordOne.address._id.get()).toBeDefined();
-    let addressDBData = await this.address.findOne({ _id: this.recordOne.address.get() });
-    expect(this.recordOne.address.get({ populate: true })).toEqual(addressDBData);
-    expect(this.userOneData.address.city).toBe(addressDBData.city);
-    expect(this.userOneData.address.pin).toBe(addressDBData.pin);
-    expect(this.recordOne.address.city.get()).toBe('Mehsana');
-    expect(this.recordOne.address.pin.get()).toBe('384002');
-  });
+  describe('One Field Test', () => {
+    describe('Required Test', () => {
+      test('required one field', async () => {
+        this.user.fields.address = Fields.One({ doc: this.address, required: true });
+        this.user.fields.elementsKeys.push('address');
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+        });
+        await expect(rec.save()).rejects.toThrow(':: address is required fields');
+      });
 
-  test('update one field record', async () => {
-    expect.assertions(3);
-    await this.recordOneUpdate.save();
-    expect(this.recordOneUpdate.address._id.get()).toBeDefined();
-    this.recordOneUpdate.address.city.set('Pune');
-    await this.recordOneUpdate.save();
-    let addressDBData = await this.address.findOne({ _id: this.recordOneUpdate.address._id.get() });
-    expect(addressDBData.city).toBe('Pune');
-    expect(this.recordOneUpdate.address.pin.get()).toBe('384002');
-  });
+      test('not required one field', async () => {
+        this.user.fields.address = Fields.One({ doc: this.address });
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+        });
+        await rec.save();
+        expect(rec._id.get()).toBeDefined();
+        expect(rec.address.get()).toBeUndefined();
+      });
 
-  test('Save many field record', async () => {
-    expect.assertions(8);
-    await this.recordMany.save();
-    expect(this.recordMany.address.getEle(0)._id.get()).toBeDefined();
-    expect(this.recordMany.address.getEle(1)._id.get()).toBeDefined();
-    let addressDBData = await this.address.findOne({
-      _id: this.recordMany.address.getEle(0).get(),
+      test('not required one field but required document fields', async () => {
+        this.user.fields.address = Fields.One({ doc: this.address });
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+          address: {
+            city: 'Mehsana',
+          },
+        });
+        await expect(rec.save()).rejects.toThrow('::  :: pin is required fields');
+      });
     });
-    expect(this.recordMany.address.getEle(0).get({ populate: true })).toEqual(addressDBData);
-    expect(this.userManyData.address[0].city).toBe(addressDBData.city);
-    expect(this.userManyData.address[0].pin).toBe(addressDBData.pin);
-    addressDBData = await this.address.findOne({
-      _id: this.recordMany.address.getEle(1).get(),
+
+    test('populate get test', async () => {
+      const rec = this.user.create({
+        firstname: 'Deep',
+        lastname: 'Patel',
+        address: {
+          city: 'Mehsana',
+          pin: 384002,
+        },
+      });
+      await rec.save();
+      expect(rec.address.get()).toBe(rec.address.record.getId().toString());
+      expect(rec.address.get({ populate: true })).toEqual(rec.address.record.toJson());
     });
-    expect(this.recordMany.address.getEle(1).get({ populate: true })).toEqual(addressDBData);
-    expect(this.userManyData.address[1].city).toBe(addressDBData.city);
-    expect(this.userManyData.address[1].pin).toBe(addressDBData.pin);
+
+    describe('Create Update Operations', async () => {
+      test('save record', async () => {
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+          address: {
+            city: 'Mehsana',
+            pin: 384002,
+          },
+        });
+        await rec.save();
+        expect(rec.address._id.get()).toBeDefined();
+        expect(rec.address.city.get()).toBe('Mehsana');
+        expect(rec.address.pin.get()).toBe(384002);
+      });
+
+      test('update record', async () => {
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+        });
+        await rec.save();
+        expect(rec.address.get()).toBeUndefined();
+        rec.address.set({
+          city: 'Mehsana',
+          pin: 384002,
+        });
+        await rec.save();
+        expect(rec.address.get()).toBeDefined();
+        expect(rec.address.city.get()).toBe('Mehsana');
+        expect(rec.address.pin.get()).toBe(384002);
+      });
+
+      test('update record if record updated', async () => {
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+        });
+        await rec.save();
+        expect(rec.address.pin.get()).toBeUndefined();
+        rec.address.city.set('mehsana');
+        rec.address.pin.set(384002);
+        await rec.save();
+        expect(rec.address.get()).toBeDefined();
+        expect(rec.address.city.get()).toBe('mehsana');
+        expect(rec.address.pin.get()).toBe(384002);
+      });
+
+      test('update record get record by id record updated', async () => {
+        const rec = this.user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+        });
+        expect(rec.address.pin.get()).toBeUndefined();
+        expect(rec.address.get()).toBeUndefined();
+        await rec.save();
+        const newRec = await this.user.findById(rec._id.get());
+        expect(newRec.address.get()).toBeUndefined();
+        newRec.address.set({
+          city: 'Mehsana',
+          pin: 384002,
+        });
+        await newRec.save();
+        expect(newRec.address.get()).toBeDefined();
+        expect(newRec.address.city.get()).toBe('Mehsana');
+        expect(newRec.address.pin.get()).toBe(384002);
+      });
+    });
   });
 });
 
