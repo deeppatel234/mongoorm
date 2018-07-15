@@ -26,6 +26,10 @@ class Connection {
    * @memberof Connection
    */
   connect(uri, options) {
+    if (!uri) {
+      throw new Error('MongoDB URI Not Defined');
+    }
+
     options = this.scanOptions(options);
     if (this.client) {
       return new Promise(resolve => resolve());
