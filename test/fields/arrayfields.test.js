@@ -17,9 +17,14 @@ describe('ArrayFields', () => {
   });
 
   describe('default property', () => {
-    test('default test', () => {
+    test('default test array element', () => {
       let myField = Fields.Array({ ele: Fields.String(), default: ['a'] });
       expect(myField.get()).toMatchObject(['a']);
+    });
+
+    test('default test not array element', () => {
+      let myField = Fields.Array({ ele: Fields.String(), default: 'b' });
+      expect(myField.get()).toMatchObject(['b']);
     });
 
     test('default test with field setters', () => {
@@ -29,6 +34,11 @@ describe('ArrayFields', () => {
   });
 
   describe('validation test', () => {
+    test('validate blank values without required', async () => {
+      let myField = Fields.Array({ ele: Fields.String({ uppercase: true }) });
+      expect(myField.validate()).resolves.toBe();
+    });
+
     describe('array field with non-object element', () => {
       test('validate with string array', async () => {
         let myField = Fields.Array({ ele: Fields.String({ uppercase: true }) });
@@ -74,7 +84,6 @@ describe('ArrayFields', () => {
     });
 
     test('array field with object element', async () => {
-      // expect.assertions(2);
       let myField = Fields.Array({
         ele: {
           name: Fields.String({ uppercase: true }),
@@ -94,7 +103,7 @@ describe('ArrayFields', () => {
       } catch (e) {
         expect(e.message).toBe(undefined);
       }
-      myField.getEle(1).age.set(23);
+      myField.getByIndex(1).age.set(23);
       expect(await myField.validate()).toBe();
     });
   });
