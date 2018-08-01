@@ -21,26 +21,24 @@ beforeAll(async () => {
   }
 
   this.address = new Address({ document: 'address' });
-
-  class User extends Document {
-    initFields(fields) {
-      return {
-        firstname: fields.String(),
-        lastname: fields.String(),
-      };
-    }
-  }
-
-  this.user = new User({ document: 'user' });
 });
 
 describe('Realtional Field Test', () => {
   describe('One Field Test', () => {
     describe('Required Test', () => {
+      const self = this;
       test('required one field', async () => {
-        this.user.fields.address = Fields.One({ doc: this.address, required: true });
-        this.user.fields.elementsKeys.push('address');
-        const rec = this.user.create({
+        class User extends Document {
+          initFields(fields) {
+            return {
+              firstname: fields.String(),
+              lastname: fields.String(),
+              address: fields.One({ doc: self.address, required: true }),
+            };
+          }
+        }
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -48,8 +46,17 @@ describe('Realtional Field Test', () => {
       });
 
       test('not required one field', async () => {
-        this.user.fields.address = Fields.One({ doc: this.address });
-        const rec = this.user.create({
+        class User extends Document {
+          initFields(fields) {
+            return {
+              firstname: fields.String(),
+              lastname: fields.String(),
+              address: fields.One({ doc: self.address }),
+            };
+          }
+        }
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -59,8 +66,17 @@ describe('Realtional Field Test', () => {
       });
 
       test('not required one field but required document fields', async () => {
-        this.user.fields.address = Fields.One({ doc: this.address });
-        const rec = this.user.create({
+        class User extends Document {
+          initFields(fields) {
+            return {
+              firstname: fields.String(),
+              lastname: fields.String(),
+              address: fields.One({ doc: self.address }),
+            };
+          }
+        }
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
           address: {
@@ -72,7 +88,18 @@ describe('Realtional Field Test', () => {
     });
 
     test('populate get test', async () => {
-      const rec = this.user.create({
+      const self = this;
+      class User extends Document {
+        initFields(fields) {
+          return {
+            firstname: fields.String(),
+            lastname: fields.String(),
+            address: fields.One({ doc: self.address }),
+          };
+        }
+      }
+      const user = new User({ document: 'user' });
+      const rec = user.create({
         firstname: 'Deep',
         lastname: 'Patel',
         address: {
@@ -86,71 +113,102 @@ describe('Realtional Field Test', () => {
     });
 
     describe('Create Update Operations', async () => {
-      test('save record', async () => {
-        const rec = this.user.create({
+      const self = this;
+      class User extends Document {
+        initFields(fields) {
+          return {
+            firstname: fields.String(),
+            lastname: fields.String(),
+            address: fields.One({ doc: self.address }),
+          };
+        }
+      }
+
+      test('save record in init value', async () => {
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
           address: {
-            city: 'Mehsana',
-            pin: 384002,
+            city: 'Mehsana1',
+            pin: 384001,
           },
         });
         await rec.save();
         expect(rec.address._id.get()).toBeDefined();
-        expect(rec.address.city.get()).toBe('Mehsana');
+        expect(rec.address.city.get()).toBe('Mehsana1');
+        expect(rec.address.pin.get()).toBe(384001);
+      });
+
+      test('save record in set value function', async () => {
+        const user = new User({ document: 'user' });
+        const rec = user.create({
+          firstname: 'Deep',
+          lastname: 'Patel',
+        });
+        rec.address.set({
+          city: 'Mehsana2',
+          pin: 384002,
+        });
+        await rec.save();
+        expect(rec.address._id.get()).toBeDefined();
+        expect(rec.address.city.get()).toBe('Mehsana2');
         expect(rec.address.pin.get()).toBe(384002);
       });
 
       test('update record', async () => {
-        const rec = this.user.create({
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
         });
         await rec.save();
         expect(rec.address.get()).toBeUndefined();
         rec.address.set({
-          city: 'Mehsana',
-          pin: 384002,
+          city: 'Mehsana3',
+          pin: 384003,
         });
         await rec.save();
         expect(rec.address.get()).toBeDefined();
-        expect(rec.address.city.get()).toBe('Mehsana');
-        expect(rec.address.pin.get()).toBe(384002);
+        expect(rec.address.city.get()).toBe('Mehsana3');
+        expect(rec.address.pin.get()).toBe(384003);
       });
 
       test('update record if record updated', async () => {
-        const rec = this.user.create({
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
         });
         await rec.save();
         expect(rec.address.pin.get()).toBeUndefined();
-        rec.address.city.set('mehsana');
-        rec.address.pin.set(384002);
+        rec.address.city.set('mehsana4');
+        rec.address.pin.set(384004);
         await rec.save();
         expect(rec.address.get()).toBeDefined();
-        expect(rec.address.city.get()).toBe('mehsana');
-        expect(rec.address.pin.get()).toBe(384002);
+        expect(rec.address.city.get()).toBe('mehsana4');
+        expect(rec.address.pin.get()).toBe(384004);
       });
 
       test('update record get record by id record updated', async () => {
-        const rec = this.user.create({
+        const user = new User({ document: 'user' });
+        const rec = user.create({
           firstname: 'Deep',
           lastname: 'Patel',
         });
         expect(rec.address.pin.get()).toBeUndefined();
         expect(rec.address.get()).toBeUndefined();
         await rec.save();
-        const newRec = await this.user.findById(rec._id.get());
+        const newRec = await user.findById(rec._id.get());
         expect(newRec.address.get()).toBeUndefined();
         newRec.address.set({
-          city: 'Mehsana',
-          pin: 384002,
+          city: 'Mehsana5',
+          pin: 384005,
         });
         await newRec.save();
         expect(newRec.address.get()).toBeDefined();
-        expect(newRec.address.city.get()).toBe('Mehsana');
-        expect(newRec.address.pin.get()).toBe(384002);
+        expect(newRec.address.city.get()).toBe('Mehsana5');
+        expect(newRec.address.pin.get()).toBe(384005);
       });
     });
   });
