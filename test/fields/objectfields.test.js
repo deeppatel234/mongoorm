@@ -1,4 +1,4 @@
-const { Fields } = require('../mongoorm');
+const { FieldsObj, Fields } = require('../mongoorm');
 
 const ele = {
   name: Fields.String({ uppercase: true, required: true }),
@@ -24,15 +24,18 @@ const complexEle = {
   i: Fields.Integer(),
 };
 
+Fields.FieldUtils.prepareFieldsRec(ele);
+Fields.FieldUtils.prepareFieldsRec(complexEle);
+
 describe('ObjectFields', () => {
   describe('preparefields test', () => {
     test('basic preparefields', () => {
-      let myField = Fields.Object({ ele });
+      let myField = FieldsObj.Object({ ele });
       expect(myField.address.type).toBe('object');
     });
 
     test('compalex preparefields', () => {
-      let myField = Fields.Object({ ele: complexEle });
+      let myField = FieldsObj.Object({ ele: complexEle });
       expect(myField.a.type).toBe('object');
       expect(myField.a.b.type).toBe('object');
       expect(myField.a.b.d.type).toBe('object');
@@ -41,7 +44,7 @@ describe('ObjectFields', () => {
 
   describe('setFieldName test', () => {
     test('basic setFieldName', () => {
-      let myField = Fields.Object({ ele });
+      let myField = FieldsObj.Object({ ele });
       myField.setFieldName('hello');
       expect(myField.address.fieldName).toBe('address');
       expect(myField.name.fieldName).toBe('name');
@@ -49,7 +52,7 @@ describe('ObjectFields', () => {
     });
 
     test('compalex setFieldName', () => {
-      let myField = Fields.Object({ ele: complexEle });
+      let myField = FieldsObj.Object({ ele: complexEle });
       myField.setFieldName('hello');
       expect(myField.a.fieldName).toBe('a');
       expect(myField.a.b.fieldName).toBe('b');
@@ -61,7 +64,7 @@ describe('ObjectFields', () => {
 
   describe('validate data test', () => {
     test('basic validate data', async () => {
-      let myField = Fields.Object({ ele });
+      let myField = FieldsObj.Object({ ele });
       myField.initValue({
         name: 'deep',
         address: {
@@ -78,7 +81,7 @@ describe('ObjectFields', () => {
     });
 
     test('compalex validate data', async () => {
-      let myField = Fields.Object({ ele: complexEle });
+      let myField = FieldsObj.Object({ ele: complexEle });
       myField.initValue({
         h: 'h',
         a: {
@@ -110,7 +113,7 @@ describe('ObjectFields', () => {
 
   describe('modified data test', () => {
     test('basic modified data', () => {
-      let myField = Fields.Object({ ele });
+      let myField = FieldsObj.Object({ ele });
       myField.initValue({
         name: 'deep',
         address: {
@@ -129,7 +132,7 @@ describe('ObjectFields', () => {
     });
 
     test('compalex modified data', () => {
-      let myField = Fields.Object({ ele: complexEle });
+      let myField = FieldsObj.Object({ ele: complexEle });
       myField.initValue({
         h: 'h',
         a: {
@@ -163,7 +166,7 @@ describe('ObjectFields', () => {
 
   describe('set and get data test', () => {
     test('basic set data', () => {
-      let myField = Fields.Object({ ele });
+      let myField = FieldsObj.Object({ ele });
       myField.initValue({
         name: 'deep',
         address: {
@@ -189,7 +192,7 @@ describe('ObjectFields', () => {
     });
 
     test('compalex set data', () => {
-      let myField = Fields.Object({ ele: complexEle });
+      let myField = FieldsObj.Object({ ele: complexEle });
       myField.initValue({
         h: 'h',
         a: {
@@ -239,13 +242,13 @@ describe('ObjectFields', () => {
 
   describe('getGlobleProps test', () => {
     test('basic getGlobleProps', () => {
-      let myField = Fields.Object({ ele });
+      let myField = FieldsObj.Object({ ele });
       expect(myField.getGlobleProps('required')).toMatchObject({ name: true, address: { city: true } });
       expect(myField.getGlobleProps(['required'])).toMatchObject({ name: { required: true }, address: { city: { required: true } } });
     });
 
     test('compalex getGlobleProps', () => {
-      let myField = Fields.Object({ ele: complexEle });
+      let myField = FieldsObj.Object({ ele: complexEle });
       expect(myField.getGlobleProps('required')).toMatchObject({ h: true, a: { f: true, b: { d: { e: true } } } });
       expect(myField.getGlobleProps(['required'])).toMatchObject({ h: { required: true }, a: { f: { required: true }, b: { d: { e: { required: true } } } } });
     });
