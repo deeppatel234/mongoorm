@@ -31,6 +31,7 @@ beforeAll(() => {
     },
   };
 
+  Fields.FieldUtils.prepareFieldsRec(this.documents.fields.props.ele);
 
   this.data = {
     _id: 1,
