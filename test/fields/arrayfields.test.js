@@ -31,6 +31,20 @@ describe('ArrayFields', () => {
       let myField = FieldsObj.Array({ ele: Fields.String({ uppercase: true }), default: ['a'] });
       expect(myField.get()).toMatchObject(['A']);
     });
+
+    test('default test with function', () => {
+      let counter = 0;
+      let counterFunc = function () {
+        counter += 1;
+        return counter;
+      };
+      let myField = FieldsObj.Array({
+        ele: { id: Fields.Integer({ default: counterFunc }), name: Fields.String() },
+        default: [{ name: 'defaultValue' }],
+      });
+      myField.push({ name: 'Deep' });
+      expect(myField.get()).toMatchObject([{ id: 1, name: 'defaultValue' }, { id: 2, name: 'Deep' }]);
+    });
   });
 
   describe('validation test', () => {
