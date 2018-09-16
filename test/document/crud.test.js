@@ -29,6 +29,7 @@ class UserWith extends Document {
     return {
       firstname: fields.String(),
       lastname: fields.String(),
+      middlename: fields.String({ uppercase: true }),
       address: {
         city: fields.String(),
         pin: fields.String(),
@@ -138,6 +139,29 @@ describe('CRUD Operations With Timestamps', () => {
   });
 });
 
+describe('Many Insert and Update Operations', () => {
+  test('Create Many record', async () => {
+    expect.assertions(2);
+    const data = await this.userWith.insertManyRecords([{
+      middlename: 'a',
+    }, {
+      middlename: 'b',
+    }, {
+      middlename: 'b',
+    }]);
+    expect(data.ops.map(d => d.middlename)).toMatchObject(['A', 'B', 'B']);
+    expect(data.insertedCount).toBe(3);
+  });
+
+  test('Update Many record', async () => {
+    expect.assertions(2);
+    const data = await this.userWith.updateManyRecords({ middlename: 'B' }, { middlename: 'c' });
+    expect(data.modifiedCount).toBe(2);
+    const findData = await this.userWith.findToArray({ middlename: 'C' });
+    expect(findData.length).toBe(2);
+  });
+});
+
 describe('Hooks Test', () => {
   describe('Hooks resolved', () => {
     test('pre, post hook when save record', async () => {
@@ -207,5 +231,6 @@ describe('Hooks Test', () => {
 
 afterAll(async () => {
   await this.user.drop();
+  await this.userWith.drop();
   await mongoorm.close(true);
 });
