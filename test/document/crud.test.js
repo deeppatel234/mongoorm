@@ -60,10 +60,10 @@ beforeAll(async () => {
   await mongoorm.connect('mongodb://localhost:27017/mongoormtest');
 
   this.user = new User({ document: 'user' });
-  this.record = this.user.create(this.userData);
+  this.record = this.user.createRecord(this.userData);
 
   this.userWith = new UserWith({ document: 'user' });
-  this.recordWith = this.userWith.create(this.userData);
+  this.recordWith = this.userWith.createRecord(this.userData);
 
   this.myHooks = new MyHooks({ document: 'user' });
 });
@@ -177,7 +177,7 @@ describe('Hooks Test', () => {
         seq.push('postSave');
         return Promise.resolve();
       });
-      await this.myHooks.create(this.userData).save();
+      await this.myHooks.createRecord(this.userData).save();
       expect(this.myHooks.preSave).toHaveBeenCalled();
       expect(this.myHooks.postSave).toHaveBeenCalled();
       expect(seq).toEqual(['preSave', 'postSave']);
@@ -196,7 +196,7 @@ describe('Hooks Test', () => {
         seq.push('postDelete');
         return Promise.resolve();
       });
-      await this.myHooks.create(this.userData).delete();
+      await this.myHooks.createRecord(this.userData).delete();
       expect(this.myHooks.preDelete).toHaveBeenCalled();
       expect(this.myHooks.postDelete).toHaveBeenCalled();
       expect(seq).toEqual(['preDelete', 'postDelete']);
@@ -217,7 +217,7 @@ describe('Hooks Test', () => {
         return Promise.resolve();
       });
       try {
-        await this.myHooks.create(this.userData).save();
+        await this.myHooks.createRecord(this.userData).save();
       } catch (e) {
         expect(e.message).toBe('break pre save');
       } finally {

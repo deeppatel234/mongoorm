@@ -38,7 +38,7 @@ describe('Realtional Field Test', () => {
           }
         }
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -56,7 +56,7 @@ describe('Realtional Field Test', () => {
           }
         }
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -76,7 +76,7 @@ describe('Realtional Field Test', () => {
           }
         }
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
           address: {
@@ -99,7 +99,7 @@ describe('Realtional Field Test', () => {
         }
       }
       const user = new User({ document: 'user' });
-      const rec = user.create({
+      const rec = user.createRecord({
         firstname: 'Deep',
         lastname: 'Patel',
         address: {
@@ -126,7 +126,7 @@ describe('Realtional Field Test', () => {
 
       test('save record in init value', async () => {
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
           address: {
@@ -142,7 +142,7 @@ describe('Realtional Field Test', () => {
 
       test('save record in set value function', async () => {
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -158,7 +158,7 @@ describe('Realtional Field Test', () => {
 
       test('update record', async () => {
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -176,7 +176,7 @@ describe('Realtional Field Test', () => {
 
       test('update record if record updated', async () => {
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
         });
@@ -192,7 +192,7 @@ describe('Realtional Field Test', () => {
 
       test('update record get record by id record updated', async () => {
         const user = new User({ document: 'user' });
-        const rec = user.create({
+        const rec = user.createRecord({
           firstname: 'Deep',
           lastname: 'Patel',
         });
