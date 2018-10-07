@@ -124,6 +124,11 @@ describe('StringFields', () => {
         return string.charAt(0).toUpperCase() + string.slice(1);
       }
 
+      test('(+) capitalize default value', () => {
+        let field = new StringFields({ capitalize: true, default: 'hello' });
+        expect(field.get()).toBe('Hello');
+      });
+
       test('(+) capitalize enabled', () => {
         let field = new StringFields({ capitalize: true });
         field.set(stringValue);
