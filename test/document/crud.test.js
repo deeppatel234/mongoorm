@@ -47,6 +47,26 @@ class MyHooks extends Document {
   }
 }
 
+class Employee extends Document {
+  initFields(fields) {
+    return {
+      firstname: fields.String({ string: 'First Name' }),
+      lastname: fields.String({ string: 'Last Name' }),
+      address: fields.Array({
+        string: 'Address',
+        ele: {
+          city: fields.String({ string: 'City' }),
+          pin: fields.String({ string: 'Pin Code' }),
+        },
+      }),
+      birthinfo: {
+        date: fields.DateTime({ string: 'Date of Birth' }),
+      },
+      mobile: fields.One({ string: 'Mobile', doc: new User({ document: 'user' }) }),
+    };
+  }
+}
+
 this.userData = {
   firstname: 'Deep',
   lastname: 'Patel',
@@ -60,12 +80,85 @@ beforeAll(async () => {
   await mongoorm.connect('mongodb://localhost:27017/mongoormtest');
 
   this.user = new User({ document: 'user' });
+  this.employee = new Employee({ document: 'employee' });
   this.record = this.user.createRecord(this.userData);
 
   this.userWith = new UserWith({ document: 'user' });
   this.recordWith = this.userWith.createRecord(this.userData);
 
   this.myHooks = new MyHooks({ document: 'user' });
+});
+
+test('Field Info Test', async () => {
+  expect.assertions(1);
+  const fieldInfo = this.employee.getFieldsInfo();
+  expect(fieldInfo).toMatchObject({
+    _id: {
+      name: '_id',
+      string: 'ID',
+      type: 'objectid',
+    },
+    address: {
+      ele: {
+        ele: {
+          city: {
+            name: 'city',
+            string: 'City',
+            type: 'string',
+          },
+          pin: {
+            name: 'pin',
+            string: 'Pin Code',
+            type: 'string',
+          },
+        },
+        name: 'address',
+        string: 'address',
+        type: 'object',
+      },
+      name: 'address',
+      string: 'Address',
+      type: 'array',
+    },
+    birthinfo: {
+      ele: {
+        date: {
+          name: 'date',
+          string: 'Date of Birth',
+          type: 'datetime',
+        },
+      },
+      name: 'birthinfo',
+      string: 'birthinfo',
+      type: 'object',
+    },
+    create_at: {
+      name: 'create_at',
+      string: 'Create At',
+      type: 'datetime',
+    },
+    firstname: {
+      name: 'firstname',
+      string: 'First Name',
+      type: 'string',
+    },
+    lastname: {
+      name: 'lastname',
+      string: 'Last Name',
+      type: 'string',
+    },
+    mobile: {
+      model: 'user',
+      name: 'mobile',
+      string: 'Mobile',
+      type: 'one',
+    },
+    write_at: {
+      name: 'write_at',
+      string: 'Write At',
+      type: 'datetime',
+    },
+  });
 });
 
 describe('CRUD Operations Without Timestamps', () => {
