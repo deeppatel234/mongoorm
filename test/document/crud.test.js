@@ -62,7 +62,6 @@ class Employee extends Document {
       birthinfo: {
         date: fields.DateTime({ string: 'Date of Birth' }),
       },
-      mobile: fields.One({ string: 'Mobile', doc: new User({ document: 'user' }) }),
     };
   }
 }
@@ -146,12 +145,6 @@ test('Field Info Test', async () => {
       name: 'lastname',
       string: 'Last Name',
       type: 'string',
-    },
-    mobile: {
-      model: 'user',
-      name: 'mobile',
-      string: 'Mobile',
-      type: 'one',
     },
     write_at: {
       name: 'write_at',
