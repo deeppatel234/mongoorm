@@ -29,7 +29,7 @@
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jest": "^22.1.2",
     "jest": "^22.4.2",
-    "winston": "^2.4.1"
+    "winston": "^3.1.0"
   },
   "jest": {
     "testPathIgnorePatterns": [
