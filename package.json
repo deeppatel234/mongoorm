@@ -1,6 +1,6 @@
 {
   "name": "mongoorm",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "ORM for Mongodb in Node JS",
   "main": "index.js",
   "scripts": {
