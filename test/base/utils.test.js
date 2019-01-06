@@ -6,6 +6,10 @@ describe('Mongo Utils', () => {
       expect(MongoUtils.obj2dot({ a: 1, b: { c: 2 } })).toMatchObject({ a: 1, 'b.c': 2 });
     });
 
+    test('objectid obj2dot', () => {
+      expect(MongoUtils.obj2dot({ a: 1, b: { _bsontype: 'ObjectID' } })).toMatchObject({ a: 1, b: { _bsontype: 'ObjectID' } });
+    });
+
     test('complex obj2dot', () => {
       const obj = {
         a: 1,
