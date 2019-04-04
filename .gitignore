@@ -65,3 +65,6 @@ testorm
 
 # Webstorm editor config
 .idea
+
+# Testing file
+test/TestFile.js
