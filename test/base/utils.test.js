@@ -32,17 +32,4 @@ describe('Mongo Utils', () => {
       });
     });
   });
-
-  describe('conditional extend function', () => {
-    test('extend with true condition', () => {
-      let obj = { a: 1 };
-      MongoUtils.extend(obj, { b: 2 }, true);
-      expect(obj).toMatchObject({ a: 1, b: 2 });
-    });
-    test('extend with false condition', () => {
-      let obj = { a: 1 };
-      MongoUtils.extend(obj, { b: 2 }, false);
-      expect(obj).toMatchObject({ a: 1 });
-    });
-  });
 });

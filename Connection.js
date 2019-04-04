@@ -6,18 +6,22 @@
 
 // External Libraries
 const { MongoClient } = require('mongodb');
-const _ = require('lodash');
+const _isObject = require('lodash/isObject');
 
 // Internal Functions
 const logger = require('./lib/base/Logger');
 const mognoURI = require('./lib/base/MognoURI');
 const config = require('./lib/base/Configuration');
 
+
+const CONFIG_OPTIONS = ['autoIndex'];
+
 class Connection {
   constructor() {
     this.client = null;
-    this.connection = {};
+    this.connectionObj = {};
   }
+
   /**
    * For Connect to MongoDB Instance
    *
@@ -30,43 +34,50 @@ class Connection {
       throw new Error('MongoDB URI Not Defined');
     }
 
+    // filter global config
     options = this.scanOptions(options);
+
     if (this.client) {
-      return new Promise(resolve => resolve());
+      return Promise.resolve();
     }
-    uri = this.getURI(uri);
-    let self = this;
+
+    this.connectionObj = _isObject(uri) ? uri : mognoURI.parseString(uri);
+    uri = _isObject(uri) ? mognoURI.parseObject(uri) : uri;
+
     return new Promise((resolve, reject) => {
-      MongoClient.connect(uri, options).then(function (client) {
-        self.client = client;
-        logger.info('MongoDB Connected at :', self.connection.hosts.map(h => h.host).join(), 'Database:', self.connection.database);
+      MongoClient.connect(uri, options).then((client) => {
+        this.client = client;
+        logger.info('MongoDB Connected at:', this.connectionObj.hosts.map(h => h.host).join(), ' Database:', this.connectionObj.database);
         resolve(client);
-      }).catch(function (err) {
+      }).catch((err) => {
         logger.error(err);
         reject(err);
       });
     });
   }
+
   /**
    * close mongodb connection
    * @param {boolean} force
    * @memberof Connection
    */
   close(force = false) {
-    if (this.client) {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        self.client.close(force).then(function () {
-          logger.info('MongoDB Closing Connection');
-          self.client = null;
-          resolve(true);
-        }).catch(function (err) {
-          logger.info('MongoDB Closing Connection Error :', err);
-          reject(err);
-        });
-      });
+    if (!this.client) {
+      return Promise.resolve();
     }
+
+    return new Promise((resolve, reject) => {
+      this.client.close(force).then(() => {
+        logger.info('MongoDB Closing Connection');
+        this.client = null;
+        resolve(true);
+      }).catch((err) => {
+        logger.info('MongoDB Closing Connection Error :', err);
+        reject(err);
+      });
+    });
   }
+
   /**
    * get mongodb client
    * @returns connection
@@ -75,6 +86,7 @@ class Connection {
   get() {
     return this.client;
   }
+
   /**
    * get document cursor for db operations
    * @returns connection
@@ -83,6 +95,7 @@ class Connection {
   getCollection(name) {
     return this.client.db().collection(name);
   }
+
   /**
    * get mongodb cursor for db operations
    * @returns connection
@@ -91,29 +104,20 @@ class Connection {
   getDB() {
     return this.client.db();
   }
-  /**
-   * parse string from object
-   * @param {string|object} uri
-   * @memberof Connection
-   */
-  getURI(uri) {
-    if (_.isObject(uri)) {
-      this.connection = uri;
-      return mognoURI.parseObject(uri);
-    }
-    this.connection = mognoURI.parseString(uri);
-    return uri;
-  }
+
   /**
    * scan options before connect to db
+   *
    * @param {object} options
    * @memberof Connection
    */
   scanOptions(options = {}) {
-    if ('autoIndex' in options) {
-      config.set('autoIndex', options.autoIndex);
-      delete options.autoIndex;
-    }
+    Object.keys(options).forEach((key) => {
+      if (CONFIG_OPTIONS.includes(key)) {
+        config.set(key, options[key]);
+        delete options[key];
+      }
+    });
     return options;
   }
 }

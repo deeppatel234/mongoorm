@@ -11,24 +11,24 @@ describe('ArrayFields', () => {
 
     test('empty array required test', async () => {
       const req = FieldsObj.Array({ ele: Fields.String(), required: true });
-      req.initValue([]);
+      req.set([]);
       await expect(req.validate()).rejects.toThrow('is required fields');
     });
   });
 
   describe('default property', () => {
     test('default test array element', () => {
-      let myField = FieldsObj.Array({ ele: Fields.String(), default: ['a'] });
+      let myField = FieldsObj.Array({ ele: Fields.String(), defaultValue: ['a'] });
       expect(myField.get()).toMatchObject(['a']);
     });
 
     test('default test not array element', () => {
-      let myField = FieldsObj.Array({ ele: Fields.String(), default: 'b' });
+      let myField = FieldsObj.Array({ ele: Fields.String(), defaultValue: 'b' });
       expect(myField.get()).toMatchObject(['b']);
     });
 
     test('default test with field setters', () => {
-      let myField = FieldsObj.Array({ ele: Fields.String({ uppercase: true }), default: ['a'] });
+      let myField = FieldsObj.Array({ ele: Fields.String({ uppercase: true }), defaultValue: ['a'] });
       expect(myField.get()).toMatchObject(['A']);
     });
 
@@ -39,8 +39,8 @@ describe('ArrayFields', () => {
         return counter;
       };
       let myField = FieldsObj.Array({
-        ele: { id: Fields.Integer({ default: counterFunc }), name: Fields.String() },
-        default: [{ name: 'defaultValue' }],
+        ele: { id: Fields.Integer({ defaultValue: counterFunc }), name: Fields.String() },
+        defaultValue: [{ name: 'defaultValue' }],
       });
       myField.push({ name: 'Deep' });
       expect(myField.get()).toMatchObject([{ id: 1, name: 'defaultValue' }, { id: 2, name: 'Deep' }]);
@@ -49,50 +49,50 @@ describe('ArrayFields', () => {
 
   describe('validation test', () => {
     test('validate blank values without required', async () => {
-      let myField = FieldsObj.Array({ ele: Fields.String({ uppercase: true }) });
+      let myField = FieldsObj.Array({ ele: Fields.String() });
       expect(myField.validate()).resolves.toBe();
     });
 
     describe('array field with non-object element', () => {
       test('validate with string array', async () => {
-        let myField = FieldsObj.Array({ ele: Fields.String({ uppercase: true }) });
-        myField.initValue(['a', 5, 'b']);
+        let myField = FieldsObj.Array({ ele: Fields.String() });
+        myField.set(['a', 5, 'b']);
         try {
           await myField.validate();
         } catch (e) {
-          expect(e.message).toBe(undefined);
+          expect(e.message).toBe('Undefined is not string type');
         }
-        myField.initValue(['a', 'c', 'b']);
+        myField.set(['a', 'c', 'b']);
         expect(await myField.validate()).toBe();
       });
 
       test('validate with array of array', async () => {
         let myField = FieldsObj.Array({
-          ele: Fields.Array({ ele: Fields.String({ uppercase: true }) }),
+          ele: Fields.Array({ ele: Fields.String() }),
         });
-        myField.initValue([['a', 'b', 'c'], ['d', 5, 'f']]);
+        myField.set([['a', 'b', 'c'], ['d', 5, 'f']]);
         try {
           await myField.validate();
         } catch (e) {
-          expect(e.message).toBe(undefined);
+          expect(e.message).toBe('Undefined is not string type');
         }
-        myField.initValue([['a', 'b', 'c'], ['d', 'g', 'f']]);
+        myField.set([['a', 'b', 'c'], ['d', 'g', 'f']]);
         expect(await myField.validate()).toBe();
       });
 
       test('validate with array of array of array', async () => {
         let myField = FieldsObj.Array({
           ele: Fields.Array({
-            ele: Fields.Array({ ele: Fields.String({ uppercase: true }) }),
+            ele: Fields.Array({ ele: Fields.String() }),
           }),
         });
-        myField.initValue([['a', 'b', 'c'], ['d', 5, 'f']]);
+        myField.set([['a', 'b', 'c'], ['d', 5, 'f']]);
         try {
           await myField.validate();
         } catch (e) {
-          expect(e.message).toBe(undefined);
+          expect(e.message).toBe('Undefined is not string type');
         }
-        myField.initValue([[['a'], ['b']], [['c'], ['d']]]);
+        myField.set([[['a'], ['b']], [['c'], ['d']]]);
         expect(await myField.validate()).toBe();
       });
     });
@@ -105,7 +105,7 @@ describe('ArrayFields', () => {
         },
       });
 
-      myField.initValue([{
+      myField.set([{
         name: 'Deep',
         age: 21,
       }, {
@@ -115,7 +115,7 @@ describe('ArrayFields', () => {
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe(undefined);
+        expect(e.message).toBe('age is required fields');
       }
       myField.getByIndex(1).age.set(23);
       expect(await myField.validate()).toBe();
@@ -126,7 +126,7 @@ describe('ArrayFields', () => {
     describe('array field with non-object element', () => {
       test('validate with string array', () => {
         let myField = FieldsObj.Array({ ele: Fields.String({ uppercase: true }) });
-        myField.initValue(['a', 'b']);
+        myField.set(['a', 'b']);
         expect(myField.get()).toMatchObject(['A', 'B']);
       });
 
@@ -134,7 +134,7 @@ describe('ArrayFields', () => {
         let myField = FieldsObj.Array({
           ele: Fields.Array({ ele: Fields.String({ uppercase: true }) }),
         });
-        myField.initValue([['a', 'b', 'c'], ['d', 'g', 'f']]);
+        myField.set([['a', 'b', 'c'], ['d', 'g', 'f']]);
         expect(myField.get()).toMatchObject([['A', 'B', 'C'], ['D', 'G', 'F']]);
       });
 
@@ -144,7 +144,7 @@ describe('ArrayFields', () => {
             ele: Fields.Array({ ele: Fields.String({ uppercase: true }) }),
           }),
         });
-        myField.initValue([[['a', 'b', 'c'], ['d', 'g', 'f']]]);
+        myField.set([[['a', 'b', 'c'], ['d', 'g', 'f']]]);
         expect(myField.get()).toMatchObject([[['A', 'B', 'C'], ['D', 'G', 'F']]]);
       });
     });
@@ -157,7 +157,7 @@ describe('ArrayFields', () => {
         },
       });
 
-      myField.initValue([{
+      myField.set([{
         name: 'Deep',
         age: 21,
       }, {

@@ -1,14 +1,10 @@
-const AbstractFields = require('../../lib/fields/AbstractFields');
+const AbstractField = require('../../lib/fields/AbstractField');
 
-describe('AbstractFields', () => {
-  class MyFields extends AbstractFields {
+describe('AbstractField', () => {
+  class MyField extends AbstractField {
     constructor(props) {
       super(props);
-      this.type = 'string';
-      this.fieldName = 'MyField';
-      this.setSetter([{ prop: 'double', func: (prop, value) => value * 2 }]);
-
-      this.setValidator([{ prop: 'three', func: (prop, value) => value === 3, message: '{KEY} should be 3 not {VAL}' }]);
+      this.key = 'MyField';
     }
 
     getDefaultProps() {
@@ -25,13 +21,13 @@ describe('AbstractFields', () => {
 
   describe('default props test', () => {
     test('default props set in field props', async () => {
-      let myField = new MyFields({ helloProp: 'Hello' });
+      let myField = new MyField({ helloProp: 'Hello' });
       await expect(myField.props).toEqual({ helloProp: 'Hello', worldProp: 'World' });
     });
   });
 
   describe('required props test', () => {
-    class MyProp extends AbstractFields {
+    class MyProp extends AbstractField {
       getRequiredProps() {
         return ['myprop'];
       }
@@ -46,9 +42,109 @@ describe('AbstractFields', () => {
     });
   });
 
+  describe('default value test', () => {
+    test('default static test', () => {
+      let myField = new MyField({ defaultValue: 'Hello' });
+      expect(myField.get()).toBe('Hello');
+      myField.set('World');
+      expect(myField.get()).toBe('World');
+    });
+
+    test('default function test', () => {
+      let myField = new MyField({ defaultValue: () => 'Hello' });
+      expect(myField.get()).toBe('Hello');
+      myField.set('World');
+      expect(myField.get()).toBe('World');
+    });
+  });
+
+  describe('setKey test', () => {
+    test('should set field key when method called', async () => {
+      let myField = new MyField({ helloProp: 'Hello' });
+      myField.setKey('HelloField');
+      expect(myField.key).toBe('HelloField');
+    });
+  });
+
+  describe('getProps field test', () => {
+    test('getProps with no param', () => {
+      let myField = new MyField({ three: 3 });
+      expect(myField.getProps()).toEqual({
+        helloProp: 'newHello',
+        worldProp: 'World',
+        three: 3,
+      });
+    });
+
+    test('getProps with string param', () => {
+      let myField = new MyField({ three: 3 });
+      expect(myField.getProps('three')).toBe(3);
+    });
+
+    test('getProps with list param', () => {
+      let myField = new MyField({ three: 3 });
+      expect(myField.getProps(['three'])).toEqual({ three: 3 });
+    });
+  });
+
+  /*
+   * =====================
+   *  Setter Test Start
+   * ======================
+   */
+
+  describe('setters test', () => {
+    const doubleSetter = { prop: 'double', func: (prop, value) => value * 2 };
+    const tripleSetter = { prop: 'triple', func: (prop, value) => value * 3 };
+
+    test('test double setter', () => {
+      let myField = new MyField({ double: true, setter: doubleSetter });
+      myField.set(4);
+      expect(myField.get()).toBe(8);
+    });
+
+    test('double setter not call when no value passed', () => {
+      let myField = new MyField({ double: true, setter: doubleSetter });
+      expect(myField.get()).toBe(undefined);
+    });
+
+    test('register setters in field', () => {
+      let myField = new MyField({ double: true, setter: doubleSetter });
+      myField.setSetter({});
+      expect(myField.setAttrs.length).toBe(2);
+      myField.setSetter([{}, {}]);
+      expect(myField.setAttrs.length).toBe(4);
+    });
+
+    test('test triple setter', () => {
+      let myField = new MyField({ triple: true, setter: tripleSetter });
+      myField.set(3);
+      expect(myField.get()).toBe(9);
+    });
+  });
+
+  /*
+   * =====================
+   *  Setter Test End
+   * ======================
+   */
+
+  describe('modified field test', () => {
+    test('modified when init fields', () => {
+      let myField = new MyField();
+      expect(myField.isModified).toBeFalsy();
+    });
+
+    test('modified when set fields', () => {
+      let myField = new MyField();
+      myField.set(9);
+      expect(myField.isModified).toBeTruthy();
+    });
+  });
+
   describe('beforeInit function test', () => {
     let steps = [];
-    class MyProp extends AbstractFields {
+    class MyProp extends AbstractField {
       constructor(props) {
         steps.push(1);
         super(props);
@@ -62,154 +158,67 @@ describe('AbstractFields', () => {
     }
 
     test('should call beforeInit method before child class constructor', () => {
-      new MyProp();
+      const myProp = new MyProp();
+      myProp.set(9);
       expect(steps).toEqual([1, 2, 3]);
     });
   });
 
-  describe('setFieldName test', () => {
-    test('should set field name when method called', async () => {
-      let myField = new MyFields({ helloProp: 'Hello' });
-      myField.setFieldName('HelloField');
-      expect(myField.fieldName).toBe('HelloField');
-    });
-  });
-
-  /* =====================
-      Validator Test
-    ====================== */
+  /*
+   * =====================
+   *  Validator Test Start
+   * ======================
+   */
 
   describe('validator test', () => {
     test('test four validator', async () => {
-      let myField = new MyFields({ four: true, validator: { prop: 'four', func: (prop, value) => value === 4, message: '{KEY} should be 4 not {VAL}' } });
+      let myField = new MyField({ four: true, validator: { prop: 'four', func: (prop, value) => value === 4, message: '{KEY} should be 4 not {VAL}' } });
       myField.set(10);
       await expect(myField.validate()).rejects.toThrow('MyField should be 4 not true');
       myField.set(4);
-      await expect(myField.validate()).resolves.toBe();
-    });
-
-    test('test three validator', async () => {
-      let myField = new MyFields({ three: true });
-      myField.set(9);
-      await expect(myField.validate()).rejects.toThrow('MyField should be 3 not true');
-      myField.set(3);
-      await expect(myField.validate()).resolves.toBe();
+      await expect(myField.validate()).resolves.toBeDefined();
     });
 
     test('register validator in field', () => {
-      let myField = new MyFields();
+      let myField = new MyField();
       myField.setValidator({});
-      expect(myField.validateAttrs.length).toBe(2);
+      expect(myField.validateAttrs.length).toBe(1);
       myField.setValidator([{}, {}]);
-      expect(myField.validateAttrs.length).toBe(4);
+      expect(myField.validateAttrs.length).toBe(3);
+      myField.setValidator();
+      expect(myField.validateAttrs.length).toBe(3);
     });
 
     test('async validator', async () => {
-      let myField = new MyFields({ five: true, validator: { prop: 'five', func: (prop, value) => (value === 5 ? Promise.resolve() : Promise.reject()), message: '{KEY} should be 5 not {VAL}' } });
+      let myField = new MyField({ five: true, validator: { prop: 'five', func: (prop, value) => (value === 5 ? Promise.resolve() : Promise.reject()), message: '{KEY} should be 5 not {VAL}' } });
       myField.set(11);
       await expect(myField.validate()).rejects.toThrow('MyField should be 5 not true');
       myField.set(5);
-      await expect(myField.validate()).resolves.toBe();
-    });
-  });
-
-  /* =====================
-      Setter Test
-    ====================== */
-
-  describe('setters test', () => {
-    test('test double setter', () => {
-      let myField = new MyFields({ double: true });
-      myField.set(4);
-      expect(myField.get()).toBe(8);
-    });
-
-    test('double setter not call when no value passed', () => {
-      let myField = new MyFields({ double: true });
-      expect(myField.get()).toBe(undefined);
-    });
-
-    test('register setters in field', () => {
-      let myField = new MyFields({ double: true });
-      myField.setSetter({});
-      expect(myField.setAttrs.length).toBe(2);
-      myField.setSetter([{}, {}]);
-      expect(myField.setAttrs.length).toBe(4);
-    });
-
-    test('test triple setter', () => {
-      let myField = new MyFields({ triple: true, setter: { prop: 'triple', func: (prop, value) => value * 3 } });
-      myField.set(3);
-      expect(myField.get()).toBe(9);
+      await expect(myField.validate()).resolves.toBeDefined();
     });
   });
 
   describe('required property', () => {
     test('basic required test', async () => {
-      let myField = new MyFields({ required: true });
+      let myField = new MyField({ required: true });
       await expect(myField.validate()).rejects.toThrow('MyField is required fields');
       myField.set(123);
       await expect(myField.validate()).resolves.toBe();
     });
   });
 
-  describe('default property', () => {
-    test('default test', () => {
-      let myField = new MyFields({ default: 'Hello' });
-      expect(myField.get()).toBe('Hello');
-      myField.set('World');
-      expect(myField.get()).toBe('World');
-    });
-
-    test('default function test', () => {
-      let myField = new MyFields({ default: () => 'Hello' });
-      expect(myField.get()).toBe('Hello');
-      myField.set('World');
-      expect(myField.get()).toBe('World');
-    });
-  });
-
-  describe('modified field test', () => {
-    test('modified when init fields', () => {
-      let myField = new MyFields({ three: true });
-      myField.initValue(9);
-      expect(myField.isModified).toBeTruthy();
-    });
-
-    test('modified when set fields', () => {
-      let myField = new MyFields({ three: true });
-      myField.set(9);
-      expect(myField.isModified).toBeTruthy();
-    });
-  });
-
-  describe('getProps field test', () => {
-    test('getProps with no param', () => {
-      let myField = new MyFields({ three: true });
-      expect(myField.getProps()).toEqual({
-        helloProp: 'newHello',
-        worldProp: 'World',
-        three: true,
-      });
-    });
-
-    test('getProps with string param', () => {
-      let myField = new MyFields({ three: true });
-      expect(myField.getProps('three')).toBe(true);
-    });
-
-    test('getProps with list param', () => {
-      let myField = new MyFields({ three: true });
-      expect(myField.getProps(['three'])).toEqual({ three: true });
-    });
-  });
-
   describe('validateType field test', () => {
     test('validateType with UnimplementedMethod error', () => {
-      class ValidateTypeField extends AbstractFields {}
+      class ValidateTypeField extends AbstractField {}
       const validateTypeField = new ValidateTypeField();
       validateTypeField.set(1);
-      expect(() => validateTypeField.validate()).toThrow('Validate type is not implemented');
+      expect(() => validateTypeField.validate()).toThrow('validateType is not implemented');
     });
   });
+
+  /*
+  * =====================
+  *  Validator Test End
+  * ======================
+  */
 });

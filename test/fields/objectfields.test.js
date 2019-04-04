@@ -42,39 +42,40 @@ describe('ObjectFields', () => {
     });
   });
 
-  describe('setFieldName test', () => {
-    test('basic setFieldName', () => {
+  describe('setKey test', () => {
+    test('basic setKey', () => {
       let myField = FieldsObj.Object({ ele });
-      myField.setFieldName('hello');
-      expect(myField.address.fieldName).toBe('address');
-      expect(myField.name.fieldName).toBe('name');
-      expect(myField.address.city.fieldName).toBe('city');
+      myField.setKey('hello');
+      expect(myField.address.key).toBe('address');
+      expect(myField.name.key).toBe('name');
+      expect(myField.address.city.key).toBe('city');
     });
 
-    test('compalex setFieldName', () => {
+    test('compalex setKey', () => {
       let myField = FieldsObj.Object({ ele: complexEle });
-      myField.setFieldName('hello');
-      expect(myField.a.fieldName).toBe('a');
-      expect(myField.a.b.fieldName).toBe('b');
-      expect(myField.a.b.c.fieldName).toBe('c');
-      expect(myField.a.b.d.fieldName).toBe('d');
-      expect(myField.a.b.d.e.fieldName).toBe('e');
+      myField.setKey('hello');
+      expect(myField.a.key).toBe('a');
+      expect(myField.a.b.key).toBe('b');
+      expect(myField.a.b.c.key).toBe('c');
+      expect(myField.a.b.d.key).toBe('d');
+      expect(myField.a.b.d.e.key).toBe('e');
     });
   });
 
   describe('validate data test', () => {
     test('basic validate data', async () => {
       let myField = FieldsObj.Object({ ele });
-      myField.initValue({
+      myField.set({
         name: 'deep',
         address: {
           pin: 384002,
         },
       });
+      myField.setKey('data');
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe(undefined);
+        expect(e.message).toBe('city is required fields');
       }
       myField.address.city.set('gandhinagar');
       expect(await myField.validate()).toBe();
@@ -82,7 +83,7 @@ describe('ObjectFields', () => {
 
     test('compalex validate data', async () => {
       let myField = FieldsObj.Object({ ele: complexEle });
-      myField.initValue({
+      myField.set({
         h: 'h',
         a: {
           g: 1,
@@ -93,10 +94,11 @@ describe('ObjectFields', () => {
         i: 4,
       });
 
+      myField.setKey('data');
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe(undefined);
+        expect(e.message).toBe('f is required fields');
       }
 
       myField.a.f.set('z');
@@ -104,7 +106,7 @@ describe('ObjectFields', () => {
       try {
         await myField.validate();
       } catch (e) {
-        expect(e.message).toBe(undefined);
+        expect(e.message).toBe('e is required fields');
       }
       myField.a.b.d.e.set('x');
       expect(await myField.validate()).toBe();
@@ -114,7 +116,7 @@ describe('ObjectFields', () => {
   describe('modified data test', () => {
     test('basic modified data', () => {
       let myField = FieldsObj.Object({ ele });
-      myField.initValue({
+      myField.set({
         name: 'deep',
         address: {
           city: 'mehsana',
@@ -133,7 +135,7 @@ describe('ObjectFields', () => {
 
     test('compalex modified data', () => {
       let myField = FieldsObj.Object({ ele: complexEle });
-      myField.initValue({
+      myField.set({
         h: 'h',
         a: {
           f: 'f',
@@ -167,7 +169,7 @@ describe('ObjectFields', () => {
   describe('set and get data test', () => {
     test('basic set data', () => {
       let myField = FieldsObj.Object({ ele });
-      myField.initValue({
+      myField.set({
         name: 'deep',
         address: {
           city: 'mehsana',
@@ -193,7 +195,7 @@ describe('ObjectFields', () => {
 
     test('compalex set data', () => {
       let myField = FieldsObj.Object({ ele: complexEle });
-      myField.initValue({
+      myField.set({
         h: 'h',
         a: {
           f: 'f',

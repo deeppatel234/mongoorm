@@ -1,29 +1,29 @@
-const { BooleanFields } = require('../../lib/fields/BasicFields');
+const { BooleanField } = require('../../lib/fields/BasicFields');
 
-describe('BooleanFields', () => {
+describe('BooleanField', () => {
   const booleanValue = true;
   const otherBooleanValue = false;
   const nonBooleanValue = 12345;
 
   describe('basic field', () => {
     test('(+) type test', () => {
-      let field = new BooleanFields();
+      let field = new BooleanField();
       expect(field.validateType(booleanValue)).toBe(true);
     });
 
     test('(-) type test', () => {
-      let field = new BooleanFields();
+      let field = new BooleanField();
       expect(field.validateType(nonBooleanValue)).toBe(false);
     });
 
     test('(+) value test', () => {
-      let field = new BooleanFields();
+      let field = new BooleanField();
       field.set(booleanValue);
       expect(field.get()).toBe(booleanValue);
     });
 
     test('(-) value test', () => {
-      let field = new BooleanFields();
+      let field = new BooleanField();
       field.set(nonBooleanValue);
 
       // this should be failed
@@ -33,38 +33,38 @@ describe('BooleanFields', () => {
 
   describe('required property', () => {
     test('(+) field required', async () => {
-      let field = new BooleanFields({ required: true });
+      let field = new BooleanField({ required: true });
       field.set(booleanValue);
       expect(await field.validate()).toBe();
     });
 
     test('(+) field not required', async () => {
-      let field = new BooleanFields({ required: false });
+      let field = new BooleanField({ required: false });
       expect(await field.validate()).toBe();
     });
 
     test('(-) field required', async () => {
-      let field = new BooleanFields({ required: true });
+      let field = new BooleanField({ required: true });
       field.set(nonBooleanValue);
-      await expect(field.validate()).rejects.toThrow('is not boolean type');
+      await expect(field.validate()).rejects.toThrow('Undefined is not boolean type');
     });
 
     test('(+) error message when key is given', async () => {
-      let field = new BooleanFields({ required: true });
-      await expect(field.validate()).rejects.toThrow('is required fields');
+      let field = new BooleanField({ required: true });
+      await expect(field.validate()).rejects.toThrow('Undefined is required fields');
     });
   });
 
-  describe('default property', () => {
-    test('(+) default value test', () => {
-      let field = new BooleanFields({ default: booleanValue });
+  describe('defaultValue property', () => {
+    test('(+) defaultValue value test', () => {
+      let field = new BooleanField({ defaultValue: booleanValue });
       expect(field.get()).toBe(booleanValue);
       field.set(otherBooleanValue);
       expect(field.get()).toBe(otherBooleanValue);
     });
 
-    test('(+) default function test', () => {
-      let field = new BooleanFields({ default: () => booleanValue });
+    test('(+) defaultValue function test', () => {
+      let field = new BooleanField({ defaultValue: () => booleanValue });
       expect(field.get()).toBe(booleanValue);
       field.set(otherBooleanValue);
       expect(field.get()).toBe(otherBooleanValue);

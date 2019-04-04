@@ -7,11 +7,8 @@ mongoorm.setLogger({
   error: console.error,
 });
 
-class User extends Document {
-  getTimestampFields() {
-    return false;
-  }
 
+class User extends Document {
   initFields(fields) {
     return {
       firstname: fields.String(),
@@ -78,7 +75,7 @@ this.userData = {
 beforeAll(async () => {
   await mongoorm.connect('mongodb://localhost:27017/mongoormtest');
 
-  this.user = new User({ document: 'user' });
+  this.user = new User({ document: 'user', timestamps: false });
   this.employee = new Employee({ document: 'employee' });
   this.record = this.user.createRecord(this.userData);
 
@@ -131,8 +128,8 @@ test('Field Info Test', async () => {
       string: 'birthinfo',
       type: 'object',
     },
-    create_at: {
-      name: 'create_at',
+    createAt: {
+      name: 'createAt',
       string: 'Create At',
       type: 'datetime',
     },
@@ -146,8 +143,8 @@ test('Field Info Test', async () => {
       string: 'Last Name',
       type: 'string',
     },
-    write_at: {
-      name: 'write_at',
+    writeAt: {
+      name: 'writeAt',
       string: 'Write At',
       type: 'datetime',
     },
@@ -160,9 +157,9 @@ describe('CRUD Operations Without Timestamps', () => {
     await this.record.save();
     expect(!!this.record._id.get()).toBe(true);
     let userDBData = await this.user.findOne({ _id: this.record._id.get() });
-    expect(this.record.toJson()).toMatchObject(userDBData);
-    expect(this.record.create_at).toBeUndefined();
-    expect(this.record.write_at).toBeUndefined();
+    expect(this.record.get()).toMatchObject(userDBData);
+    expect(this.record.createAt).toBeUndefined();
+    expect(this.record.writeAt).toBeUndefined();
   });
 
   test('Update record', async () => {
@@ -170,9 +167,9 @@ describe('CRUD Operations Without Timestamps', () => {
     this.record.firstname.set('hello');
     await this.record.save();
     let userDBData = await this.user.findOne({ _id: this.record._id.get() });
-    expect(this.record.toJson()).toMatchObject(userDBData);
-    expect(this.record.create_at).toBeUndefined();
-    expect(this.record.write_at).toBeUndefined();
+    expect(this.record.get()).toMatchObject(userDBData);
+    expect(this.record.createAt).toBeUndefined();
+    expect(this.record.writeAt).toBeUndefined();
   });
 
   test('Complex Update record', async () => {
@@ -180,9 +177,9 @@ describe('CRUD Operations Without Timestamps', () => {
     this.record.address.city.set('Gandhinagar');
     await this.record.save();
     let userDBData = await this.user.findOne({ _id: this.record._id.get() });
-    expect(this.record.toJson()).toMatchObject(userDBData);
-    expect(this.record.create_at).toBeUndefined();
-    expect(this.record.write_at).toBeUndefined();
+    expect(this.record.get()).toMatchObject(userDBData);
+    expect(this.record.createAt).toBeUndefined();
+    expect(this.record.writeAt).toBeUndefined();
   });
 
   test('Delete record', async () => {
@@ -199,9 +196,9 @@ describe('CRUD Operations With Timestamps', () => {
     await this.recordWith.save();
     expect(!!this.recordWith._id.get()).toBe(true);
     let userDBData = await this.userWith.findOne({ _id: this.recordWith._id.get() });
-    expect(this.recordWith.toJson()).toMatchObject(userDBData);
-    expect(this.recordWith.create_at.get()).toBe(userDBData.create_at);
-    expect(this.recordWith.write_at.get()).toBe(userDBData.write_at);
+    expect(this.recordWith.get()).toMatchObject(userDBData);
+    expect(this.recordWith.createAt.get()).toBe(userDBData.createAt);
+    expect(this.recordWith.writeAt.get()).toBe(userDBData.writeAt);
   });
 
   test('Update record', async () => {
@@ -209,9 +206,9 @@ describe('CRUD Operations With Timestamps', () => {
     this.recordWith.firstname.set('hello');
     await this.recordWith.save();
     let userDBData = await this.userWith.findOne({ _id: this.recordWith._id.get() });
-    expect(this.recordWith.toJson()).toMatchObject(userDBData);
-    expect(this.recordWith.create_at.get()).toBe(userDBData.create_at);
-    expect(this.recordWith.write_at.get()).toBe(userDBData.write_at);
+    expect(this.recordWith.get()).toMatchObject(userDBData);
+    expect(this.recordWith.createAt.get()).toBe(userDBData.createAt);
+    expect(this.recordWith.writeAt.get()).toBe(userDBData.writeAt);
   });
 
   test('Complex Update record', async () => {
@@ -219,34 +216,34 @@ describe('CRUD Operations With Timestamps', () => {
     this.recordWith.address.city.set('Gandhinagar');
     await this.recordWith.save();
     let userDBData = await this.userWith.findOne({ _id: this.recordWith._id.get() });
-    expect(this.recordWith.toJson()).toMatchObject(userDBData);
-    expect(this.recordWith.create_at.get()).toBe(userDBData.create_at);
-    expect(this.recordWith.write_at.get()).toBe(userDBData.write_at);
+    expect(this.recordWith.get()).toMatchObject(userDBData);
+    expect(this.recordWith.createAt.get()).toBe(userDBData.createAt);
+    expect(this.recordWith.writeAt.get()).toBe(userDBData.writeAt);
   });
 });
 
-describe('Many Insert and Update Operations', () => {
-  test('Create Many record', async () => {
-    expect.assertions(2);
-    const data = await this.userWith.insertManyRecords([{
-      middlename: 'a',
-    }, {
-      middlename: 'b',
-    }, {
-      middlename: 'b',
-    }]);
-    expect(data.ops.map(d => d.middlename)).toMatchObject(['A', 'B', 'B']);
-    expect(data.insertedCount).toBe(3);
-  });
+// describe('Many Insert and Update Operations', () => {
+//   test('Create Many record', async () => {
+//     expect.assertions(2);
+//     const data = await this.userWith.insertManyRecords([{
+//       middlename: 'a',
+//     }, {
+//       middlename: 'b',
+//     }, {
+//       middlename: 'b',
+//     }]);
+//     expect(data.ops.map(d => d.middlename)).toMatchObject(['A', 'B', 'B']);
+//     expect(data.insertedCount).toBe(3);
+//   });
 
-  test('Update Many record', async () => {
-    expect.assertions(2);
-    const data = await this.userWith.updateManyRecords({ middlename: 'B' }, { middlename: 'c' });
-    expect(data.modifiedCount).toBe(2);
-    const findData = await this.userWith.findToArray({ middlename: 'C' });
-    expect(findData.length).toBe(2);
-  });
-});
+//   test('Update Many record', async () => {
+//     expect.assertions(2);
+//     const data = await this.userWith.updateManyRecords({ middlename: 'B' }, { middlename: 'c' });
+//     expect(data.modifiedCount).toBe(2);
+//     const findData = await this.userWith.findToArray({ middlename: 'C' });
+//     expect(findData.length).toBe(2);
+//   });
+// });
 
 describe('Hooks Test', () => {
   describe('Hooks resolved', () => {
@@ -282,7 +279,7 @@ describe('Hooks Test', () => {
         seq.push('postDelete');
         return Promise.resolve();
       });
-      await this.myHooks.createRecord(this.userData).delete();
+      await this.myHooks.createRecord({ _id: '507f191e810c19729de860ea', ...this.userData }).delete();
       expect(this.myHooks.preDelete).toHaveBeenCalled();
       expect(this.myHooks.postDelete).toHaveBeenCalled();
       expect(seq).toEqual(['preDelete', 'postDelete']);
@@ -316,7 +313,7 @@ describe('Hooks Test', () => {
 
 
 afterAll(async () => {
-  await this.user.drop();
-  await this.userWith.drop();
+  // await this.user.drop();
+  // await this.userWith.drop();
   await mongoorm.close(true);
 });

@@ -3,9 +3,10 @@
  *       MongoORM Exports Functions
  *   =====================================
  */
+const mongodb = require('mongodb');
+
 const logger = require('./lib/base/Logger');
 const connection = require('./Connection');
-const mongodb = require('mongodb');
 const mongoutils = require('./lib/base/MongoUtils');
 
 exports.connect = (uri, options) => connection.connect(uri, options);
@@ -16,4 +17,4 @@ exports.ObjectId = mongodb.ObjectID;
 exports.getObjectID = mongoutils.getObjectID;
 
 exports.Fields = require('./lib/fields');
-exports.Document = require('./lib/document/Document');
+exports.Document = require('./lib/document');
