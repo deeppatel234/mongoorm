@@ -63,7 +63,7 @@ describe('Document Record', () => {
   test('validate function', async () => {
     await expect(this.record.validate()).resolves.toBe();
     this.record.age.set();
-    await expect(this.record.validate()).rejects.toThrow('Undefined is required fields');
+    await expect(this.record.validate()).rejects.toThrow('age is required fields');
   });
 
   test('validateBefourSave option', async () => {
@@ -71,6 +71,6 @@ describe('Document Record', () => {
     this.record.schema.options.validateBefourSave = false;
     await expect(this.record.validate()).resolves.toBe();
     this.record.schema.options.validateBefourSave = true;
-    await expect(this.record.validate()).rejects.toThrow('Undefined is required fields');
+    await expect(this.record.validate()).rejects.toThrow('age is required fields');
   });
 });
