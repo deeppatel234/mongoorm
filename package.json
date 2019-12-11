@@ -20,7 +20,7 @@
   "homepage": "https://github.com/deeppatel234/mongoorm#readme",
   "dependencies": {
     "lodash": "^4.17.5",
-    "mongodb": "^3.0.4"
+    "mongodb": "3.4.0"
   },
   "devDependencies": {
     "codecov": "^3.2.0",
